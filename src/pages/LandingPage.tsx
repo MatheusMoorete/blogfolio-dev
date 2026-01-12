@@ -1,10 +1,12 @@
 import React from 'react';
 import Window from '../components/Window';
-import { ArrowUpRight, Github, Linkedin } from 'lucide-react';
+import { ArrowUpRight, Github, Linkedin, Mail } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 
 import heroImg from '../assets/soueu.webp';
+import syncmanagerImg from '../assets/syncmanager.png';
+import unitaskImg from '../assets/unitask.png';
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
@@ -63,7 +65,7 @@ const LandingPage: React.FC = () => {
                         { key: 'blog', label: t('blog'), path: '/blog', isExternal: true },
                         { key: 'projects', label: t('projects'), path: '/#projects', isExternal: false },
                         { key: 'about', label: t('about'), path: '/#about', isExternal: false },
-                        { key: 'contact', label: t('contact'), path: '/', isExternal: true }
+                        { key: 'contact', label: t('contact'), path: '/#contact', isExternal: false }
                     ].map(link => (
                         <div key={link.key} onClick={() => {
                             if (link.isExternal) {
@@ -92,18 +94,65 @@ const LandingPage: React.FC = () => {
                     </Window>
                 </section>
 
-                {/* Projects Section */}
                 <section id="projects">
                     <h2 style={{ marginBottom: '1.5rem' }}>{t('projects')}</h2>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
-                        {[1, 2].map(i => (
-                            <Window key={i} title={`2026-01-11-project-${i}.html`}>
-                                <div style={{ width: '100%', height: '150px', background: '#eee', marginBottom: '1rem' }}></div>
-                                <h3 style={{ marginBottom: '0.5rem' }}>Project {i}</h3>
+                        {[
+                            {
+                                id: 1,
+                                title: 'SyncManager',
+                                description: 'Sistema de gerenciamento sincronizado para otimização de fluxos de trabalho.',
+                                date: '2026-01-11',
+                                image: syncmanagerImg,
+                                link: 'https://www.syncmanager.space/login',
+                                detailsLink: 'https://github.com/MatheusMoorete/SyncManager'
+                            },
+                            {
+                                id: 2,
+                                title: 'UniTask',
+                                description: 'Plataforma integrada para gerenciamento de tarefas acadêmicas e produtividade.',
+                                date: '2026-01-11',
+                                image: unitaskImg,
+                                link: 'https://www.unitask.space/',
+                                detailsLink: 'https://github.com/MatheusMoorete/UniTask'
+                            }
+                        ].map(project => (
+                            <Window key={project.id} title={`${project.date}-project-${project.id}.html`}>
+                                <div
+                                    style={{
+                                        width: '100%',
+                                        height: '200px',
+                                        background: project.image ? `url(${project.image}) #f8f9fa` : '#eee',
+                                        backgroundSize: 'contain',
+                                        backgroundPosition: 'center',
+                                        backgroundRepeat: 'no-repeat',
+                                        marginBottom: '1rem',
+                                        cursor: 'pointer',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderBottom: '1px solid black'
+                                    }}
+                                    onClick={() => project.link !== '#' && window.open(project.link, '_blank')}
+                                >
+                                    {!project.image && (project.link !== '#' ? '🔗 Abrir Projeto' : '📁 Placeholder')}
+                                </div>
+                                <h3 style={{ marginBottom: '0.5rem' }}>{project.title}</h3>
                                 <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '1.5rem' }}>
-                                    Exploração de conceitos de engenharia no projeto de exemplo {i}.
+                                    {project.description}
                                 </p>
-                                <button className="retro-button" onClick={() => navigate('/blog')}>{t('viewDetails')}</button>
+                                <button
+                                    className="retro-button"
+                                    onClick={() => {
+                                        if (project.detailsLink.startsWith('http')) {
+                                            window.open(project.detailsLink, '_blank');
+                                        } else {
+                                            navigate(project.detailsLink);
+                                        }
+                                    }}
+                                >
+                                    {t('viewDetails')}
+                                </button>
                             </Window>
                         ))}
                     </div>
@@ -151,7 +200,9 @@ const LandingPage: React.FC = () => {
                                 textDecoration: 'none',
                                 color: 'black',
                                 background: '#f0f0f0',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                flex: 1,
+                                minWidth: 0
                             }}
                             onMouseEnter={e => {
                                 (e.currentTarget as HTMLAnchorElement).style.background = '#0077B5';
@@ -165,9 +216,9 @@ const LandingPage: React.FC = () => {
                             }}
                         >
                             <Linkedin size={24} />
-                            <div>
+                            <div style={{ overflow: 'hidden' }}>
                                 <div style={{ fontWeight: 'bold' }}>LinkedIn</div>
-                                <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>@matheus-moorete</div>
+                                <div style={{ fontSize: '0.8rem', opacity: 0.8, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>@matheus-moorete</div>
                             </div>
                         </a>
 
@@ -185,7 +236,9 @@ const LandingPage: React.FC = () => {
                                 textDecoration: 'none',
                                 color: 'black',
                                 background: '#f0f0f0',
-                                transition: 'all 0.2s'
+                                transition: 'all 0.2s',
+                                flex: 1,
+                                minWidth: 0
                             }}
                             onMouseEnter={e => {
                                 (e.currentTarget as HTMLAnchorElement).style.background = '#24292e';
@@ -199,9 +252,43 @@ const LandingPage: React.FC = () => {
                             }}
                         >
                             <Github size={24} />
-                            <div>
+                            <div style={{ overflow: 'hidden' }}>
                                 <div style={{ fontWeight: 'bold' }}>GitHub</div>
-                                <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>@MatheusMoorete</div>
+                                <div style={{ fontSize: '0.8rem', opacity: 0.8, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>@MatheusMoorete</div>
+                            </div>
+                        </a>
+
+                        {/* Email */}
+                        <a
+                            href="mailto:matheus.moorete@gmail.com"
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.75rem',
+                                padding: '1rem 1.5rem',
+                                border: '2px solid black',
+                                textDecoration: 'none',
+                                color: 'black',
+                                background: '#f0f0f0',
+                                transition: 'all 0.2s',
+                                flex: 1,
+                                minWidth: 0
+                            }}
+                            onMouseEnter={e => {
+                                (e.currentTarget as HTMLAnchorElement).style.background = '#D44638';
+                                (e.currentTarget as HTMLAnchorElement).style.color = 'white';
+                                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#D44638';
+                            }}
+                            onMouseLeave={e => {
+                                (e.currentTarget as HTMLAnchorElement).style.background = '#f0f0f0';
+                                (e.currentTarget as HTMLAnchorElement).style.color = 'black';
+                                (e.currentTarget as HTMLAnchorElement).style.borderColor = 'black';
+                            }}
+                        >
+                            <Mail size={24} />
+                            <div style={{ overflow: 'hidden' }}>
+                                <div style={{ fontWeight: 'bold' }}>Email</div>
+                                <div style={{ fontSize: '0.8rem', opacity: 0.8, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>matheus.moorete@gmail.com</div>
                             </div>
                         </a>
                     </div>

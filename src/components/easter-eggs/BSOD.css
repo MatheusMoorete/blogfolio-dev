@@ -1,0 +1,56 @@
+.bsod-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #0000aa;
+    color: #ffffff;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.bsod-content {
+    max-width: 600px;
+    padding: 20px;
+}
+
+.bsod-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.bsod-title {
+    background-color: #aaaaaa;
+    color: #0000aa;
+    padding: 0 10px;
+    font-weight: bold;
+}
+
+.bsod-list {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+}
+
+.bsod-list li {
+    margin-bottom: 0.5rem;
+}
+
+.bsod-footer {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.blink {
+    animation: blink-animation 1s steps(5, start) infinite;
+}
+
+@keyframes blink-animation {
+    to {
+        visibility: hidden;
+    }
+}
