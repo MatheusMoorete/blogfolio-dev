@@ -3,12 +3,10 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { MOCK_NOTES } from '../../data/mock-notes';
 import type { StudyNote } from '../../types/study-notes';
 import GridRenderer from './GridRenderer';
-import { useTranslation } from '../../hooks/useTranslation';
 
 const StudyNoteViewer: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { t } = useTranslation();
     const [note, setNote] = useState<StudyNote | null>(null);
 
     useEffect(() => {
