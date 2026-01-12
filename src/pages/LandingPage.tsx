@@ -3,6 +3,7 @@ import Window from '../components/Window';
 import { ArrowUpRight, Github, Linkedin, Mail } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import './LandingPage.css';
 
 import heroImg from '../assets/soueu.webp';
 import syncmanagerImg from '../assets/syncmanager.png';
@@ -28,15 +29,15 @@ const LandingPage: React.FC = () => {
     return (
         <div className="landing-page">
             {/* Hero Section */}
-            <section style={{ display: 'flex', gap: '2rem', marginBottom: '4rem', alignItems: 'center' }}>
-                <div style={{ flex: '1.5' }}>
-                    <h1 style={{ fontSize: '2.2rem', lineHeight: '1.2', marginBottom: '0.2rem', fontWeight: 400 }}>
+            <section className="hero-section">
+                <div className="hero-content">
+                    <h1 className="hero-title">
                         {t('heroGreeting')} {t('heroIntro')}<strong>{t('heroName')}</strong>
                     </h1>
-                    <p style={{ fontSize: '2.2rem', lineHeight: '1.2', marginBottom: '0.5rem', color: '#333', fontWeight: 400 }}>
+                    <p className="hero-subtitle">
                         {t('heroSub')}
                     </p>
-                    <p style={{ fontSize: '1rem', marginBottom: '2rem', color: '#666', fontStyle: 'italic' }}>
+                    <p className="hero-catchphrase">
                         "{t('heroCatchphrase')}"
                     </p>
                     <button className="retro-button" onClick={() => {
@@ -44,13 +45,13 @@ const LandingPage: React.FC = () => {
                         projectsSection?.scrollIntoView({ behavior: 'smooth' });
                     }}>{t('viewProjects')}</button>
                 </div>
-                <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                <div className="hero-image-container">
                     <Window title="hello.img" className="hero-image">
                         <div style={{ overflow: 'hidden', display: 'flex' }}>
                             <img
                                 src={heroImg}
                                 alt="Hero"
-                                style={{ width: '300px', height: '200px', objectFit: 'cover', display: 'block' }}
+                                className="hero-img"
                             />
                         </div>
                     </Window>
@@ -58,9 +59,9 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* Quick Links */}
-            <section style={{ marginBottom: '4rem', position: 'relative', zIndex: 1 }}>
+            <section className="quick-links-section">
                 <h3 style={{ marginBottom: '1rem' }}>{t('quickLinks')}</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1px', background: 'black', border: '2px solid black' }}>
+                <div className="quick-links-grid">
                     {[
                         { key: 'blog', label: t('blog'), path: '/blog', isExternal: true },
                         { key: 'projects', label: t('projects'), path: '/#projects', isExternal: false },
@@ -74,7 +75,7 @@ const LandingPage: React.FC = () => {
                                 const element = document.getElementById(link.key);
                                 element?.scrollIntoView({ behavior: 'smooth' });
                             }
-                        }} style={{ background: 'white', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                        }} className="quick-link-item">
                             <span>{link.label}</span>
                             <ArrowUpRight size={18} />
                         </div>
@@ -96,7 +97,7 @@ const LandingPage: React.FC = () => {
 
                 <section id="projects">
                     <h2 style={{ marginBottom: '1.5rem' }}>{t('projects')}</h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem' }}>
+                    <div className="projects-section">
                         {[
                             {
                                 id: 1,
@@ -119,19 +120,12 @@ const LandingPage: React.FC = () => {
                         ].map(project => (
                             <Window key={project.id} title={`${project.date}-project-${project.id}.html`}>
                                 <div
+                                    className="project-image-placeholder"
                                     style={{
-                                        width: '100%',
-                                        height: '200px',
                                         background: project.image ? `url(${project.image}) #f8f9fa` : '#eee',
                                         backgroundSize: 'contain',
                                         backgroundPosition: 'center',
-                                        backgroundRepeat: 'no-repeat',
-                                        marginBottom: '1rem',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderBottom: '1px solid black'
+                                        backgroundRepeat: 'no-repeat'
                                     }}
                                     onClick={() => project.link !== '#' && window.open(project.link, '_blank')}
                                 >
@@ -161,11 +155,11 @@ const LandingPage: React.FC = () => {
 
             {/* Blog Preview Section */}
             <section>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                <div className="blog-preview-header">
                     <h2>{t('fromBlog')}</h2>
                     <a href="/blog" onClick={(e) => { e.preventDefault(); navigate('/blog'); }} style={{ textDecoration: 'underline', fontSize: '0.9rem' }}>{t('viewAll')}</a>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }}>
+                <div className="blog-preview-grid">
                     {[
                         { title: 'Computer Arch', id: 'computer-architecture-101' },
                         { title: 'Operating Systems', id: 'operating-systems-design' },
@@ -182,28 +176,16 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* Contact Section */}
-            <section id="contact" style={{ marginTop: '4rem', paddingTop: '2rem', borderTop: '2px solid var(--border-color)' }}>
+            <section id="contact" className="contact-section">
                 <h2 style={{ marginBottom: '1.5rem' }}>{t('contact')}</h2>
                 <Window title="social_links.txt">
-                    <div style={{ display: 'flex', gap: '2rem', padding: '1rem 0', justifyContent: 'center' }}>
+                    <div className="contact-links-container">
                         {/* LinkedIn */}
                         <a
                             href="https://www.linkedin.com/in/matheus-moorete/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.75rem',
-                                padding: '1rem 1.5rem',
-                                border: '2px solid black',
-                                textDecoration: 'none',
-                                color: 'black',
-                                background: '#f0f0f0',
-                                transition: 'all 0.2s',
-                                flex: 1,
-                                minWidth: 0
-                            }}
+                            className="contact-link"
                             onMouseEnter={e => {
                                 (e.currentTarget as HTMLAnchorElement).style.background = '#0077B5';
                                 (e.currentTarget as HTMLAnchorElement).style.color = 'white';
@@ -227,19 +209,7 @@ const LandingPage: React.FC = () => {
                             href="https://github.com/MatheusMoorete"
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.75rem',
-                                padding: '1rem 1.5rem',
-                                border: '2px solid black',
-                                textDecoration: 'none',
-                                color: 'black',
-                                background: '#f0f0f0',
-                                transition: 'all 0.2s',
-                                flex: 1,
-                                minWidth: 0
-                            }}
+                            className="contact-link"
                             onMouseEnter={e => {
                                 (e.currentTarget as HTMLAnchorElement).style.background = '#24292e';
                                 (e.currentTarget as HTMLAnchorElement).style.color = 'white';
@@ -261,19 +231,7 @@ const LandingPage: React.FC = () => {
                         {/* Email */}
                         <a
                             href="mailto:matheus.moorete@gmail.com"
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.75rem',
-                                padding: '1rem 1.5rem',
-                                border: '2px solid black',
-                                textDecoration: 'none',
-                                color: 'black',
-                                background: '#f0f0f0',
-                                transition: 'all 0.2s',
-                                flex: 1,
-                                minWidth: 0
-                            }}
+                            className="contact-link"
                             onMouseEnter={e => {
                                 (e.currentTarget as HTMLAnchorElement).style.background = '#D44638';
                                 (e.currentTarget as HTMLAnchorElement).style.color = 'white';
