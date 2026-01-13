@@ -3,7 +3,7 @@ import Window from '../components/Window';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import { supabase } from '../lib/supabase';
-import type { StudyNote } from '../types/study-notes';
+import type { StudyNote, ContentBlock, GridLayoutItem } from '../types/study-notes';
 
 const BlogPage: React.FC = () => {
     const navigate = useNavigate();
@@ -12,37 +12,53 @@ const BlogPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const fetchPublishedPosts = async () => {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('status', 'published')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error fetching posts:', error);
+            } else if (data) {
+                interface DatabasePost {
+                    id: string;
+                    slug: string;
+                    title: string;
+                    description?: string;
+                    category?: string;
+                    tags?: string[];
+                    created_at: string;
+                    updated_at: string;
+                    content: {
+                        image_url?: string;
+                        layout?: GridLayoutItem[];
+                        blocks?: Record<string, ContentBlock>;
+                    };
+                }
+
+                const mappedPosts = data.map((post: DatabasePost) => ({
+                    id: post.id,
+                    slug: post.slug,
+                    title: post.title,
+                    description: post.description || '',
+                    imageUrl: post.content?.image_url || '',
+                    category: post.category || 'geral',
+                    tags: post.tags || [],
+                    createdAt: post.created_at,
+                    updatedAt: post.updated_at,
+                    layout: post.content.layout || [],
+                    blocks: post.content.blocks || {},
+                }));
+                setPosts(mappedPosts);
+            }
+            setLoading(false);
+        };
+
         fetchPublishedPosts();
     }, []);
-
-    const fetchPublishedPosts = async () => {
-        setLoading(true);
-        const { data, error } = await supabase
-            .from('posts')
-            .select('*')
-            .eq('status', 'published')
-            .order('created_at', { ascending: false });
-
-        if (error) {
-            console.error('Error fetching posts:', error);
-        } else if (data) {
-            const mappedPosts = data.map(post => ({
-                id: post.id,
-                slug: post.slug,
-                title: post.title,
-                description: post.description || '',
-                imageUrl: post.content?.image_url || '',
-                category: post.category || 'geral',
-                tags: post.tags || [],
-                createdAt: post.created_at,
-                updatedAt: post.updated_at,
-                layout: post.content.layout || [],
-                blocks: post.content.blocks || {},
-            }));
-            setPosts(mappedPosts);
-        }
-        setLoading(false);
-    };
 
     return (
         <div className="blog-page" style={{ padding: '0 20px', maxWidth: '1000px', margin: '0 auto', paddingTop: '2rem' }}>

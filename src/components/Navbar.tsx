@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
+import { Menu, X } from 'lucide-react';
+import './Navbar.css';
 
 const Navbar: React.FC = () => {
     const { t } = useTranslation();
     const location = useLocation();
     const [clickCount, setClickCount] = useState(0);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleLogoClick = () => {
         const newCount = clickCount + 1;
@@ -15,6 +18,7 @@ const Navbar: React.FC = () => {
             setClickCount(0);
             window.dispatchEvent(new CustomEvent('trigger-bsod'));
         }
+        setIsMenuOpen(false);
     };
 
     const handleNavClick = (e: React.MouseEvent, target: string) => {
@@ -25,20 +29,30 @@ const Navbar: React.FC = () => {
                 element.scrollIntoView({ behavior: 'smooth' });
             }
         }
+        setIsMenuOpen(false);
+    };
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
     };
 
     return (
-        <nav className="full-width-header" style={{ marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', gap: '1.5rem', padding: '10px 0', alignItems: 'center' }}>
-                <Link to="/" onClick={handleLogoClick} style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px', borderRight: '2px solid black', paddingRight: '15px' }}>
-                    <div className="retro-control" style={{ background: 'black' }}></div>
+        <nav className="full-width-header navbar-wrapper">
+            <div className="navbar-container">
+                <Link to="/" onClick={handleLogoClick} className="navbar-logo">
+                    <div className="navbar-logo-icon"></div>
                     BLOGFOLIO
                 </Link>
-                <div style={{ display: 'flex', gap: '1.5rem' }}>
-                    <Link to="/blog" style={{ textDecoration: 'none' }}>{t('blog')}</Link>
-                    <Link to="/#projects" onClick={(e) => handleNavClick(e, 'projects')} style={{ textDecoration: 'none' }}>{t('projects')}</Link>
-                    <Link to="/#about" onClick={(e) => handleNavClick(e, 'about')} style={{ textDecoration: 'none' }}>{t('about')}</Link>
-                    <Link to="/#contact" onClick={(e) => handleNavClick(e, 'contact')} style={{ textDecoration: 'none' }}>{t('contact')}</Link>
+
+                <button className="navbar-toggle" onClick={toggleMenu} aria-label="Toggle menu">
+                    {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+
+                <div className={`navbar-links ${isMenuOpen ? 'open' : ''}`}>
+                    <Link to="/blog" className="navbar-link" onClick={() => setIsMenuOpen(false)}>{t('blog')}</Link>
+                    <Link to="/#projects" className="navbar-link" onClick={(e) => handleNavClick(e, 'projects')}>{t('projects')}</Link>
+                    <Link to="/#about" className="navbar-link" onClick={(e) => handleNavClick(e, 'about')}>{t('about')}</Link>
+                    <Link to="/#contact" className="navbar-link" onClick={(e) => handleNavClick(e, 'contact')}>{t('contact')}</Link>
                 </div>
             </div>
         </nav>
