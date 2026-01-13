@@ -10,6 +10,7 @@ import Clippy from './components/easter-eggs/Clippy';
 import Login from './pages/admin/Login';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import AdminDashboard from './pages/admin/Dashboard';
+import HackerMode from './components/easter-eggs/HackerMode';
 
 const App: React.FC = () => {
   const [showBSOD, setShowBSOD] = useState(false);
@@ -27,6 +28,7 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
+      <HackerMode />
       {showBSOD && <BSOD onComplete={handleRestart} />}
       {!showBSOD && <Clippy />}
       <Layout>

@@ -28,6 +28,34 @@ const NoteEditor: React.FC = () => {
     });
     const [status, setStatus] = useState<'draft' | 'published'>('draft');
     const [selectedBlock, setSelectedBlock] = useState<string | null>(null);
+    const [editorPos, setEditorPos] = useState({ x: window.innerWidth - 650, y: window.innerHeight - 550 });
+    const [isDragging, setIsDragging] = useState(false);
+    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (isDragging) {
+                setEditorPos({
+                    x: e.clientX - dragStart.x,
+                    y: e.clientY - dragStart.y
+                });
+            }
+        };
+
+        const handleMouseUp = () => {
+            setIsDragging(false);
+        };
+
+        if (isDragging) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isDragging, dragStart]);
 
     useEffect(() => {
         if (id && id !== 'new-note') {
@@ -261,16 +289,47 @@ const NoteEditor: React.FC = () => {
 
             {/* Property Editor for Selected Block */}
             {selectedBlock && note.blocks[selectedBlock] && (
-                <div className="retro-window" style={{ position: 'fixed', right: '20px', bottom: '20px', height: 'auto', width: '380px', zIndex: 100, boxShadow: '10px 10px 0px rgba(0,0,0,0.2)' }}>
-                    <div className="retro-window-header">
+                <div className="retro-window" style={{
+                    position: 'fixed',
+                    left: `${editorPos.x}px`,
+                    top: `${editorPos.y}px`,
+                    height: 'auto',
+                    width: 'min(90vw, 600px)',
+                    zIndex: 1000, // Garantir que fique acima de tudo
+                    boxShadow: '10px 10px 0px rgba(0,0,0,0.2)',
+                    resize: 'both',
+                    overflow: 'auto',
+                    minWidth: '300px',
+                    minHeight: '400px',
+                    background: 'white'
+                }}>
+                    <div
+                        className="retro-window-header"
+                        style={{ cursor: 'move', userSelect: 'none' }}
+                        onMouseDown={(e) => {
+                            setIsDragging(true);
+                            setDragStart({
+                                x: e.clientX - editorPos.x,
+                                y: e.clientY - editorPos.y
+                            });
+                        }}
+                    >
                         <span>Propriedades do Bloco</span>
                         <button onClick={() => setSelectedBlock(null)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer', fontWeight: 'bold' }}>X</button>
                     </div>
-                    <div className="retro-window-content" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem' }}>
-                        <div>
+                    <div className="retro-window-content" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem', height: 'calc(100% - 40px)' }}>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                             <label style={{ display: 'block', marginBottom: '0.3rem', fontWeight: 'bold', fontSize: '0.8rem' }}>Conteúdo (Markdown/URL)</label>
                             <textarea
-                                style={{ width: '100%', height: '250px', padding: '0.5rem', fontFamily: 'monospace', border: '1px solid #000' }}
+                                style={{
+                                    width: '100%',
+                                    flex: 1, // Faz o textarea crescer com a janela
+                                    minHeight: '200px',
+                                    padding: '0.5rem',
+                                    fontFamily: 'monospace',
+                                    border: '1px solid #000',
+                                    resize: 'vertical' // Permite aumentar o texto para baixo
+                                }}
                                 value={note.blocks[selectedBlock].content}
                                 onChange={e => {
                                     const val = e.target.value;

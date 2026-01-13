@@ -1,0 +1,74 @@
+.hacker-mode-active {
+    --text-primary: #00ff41 !important;
+    /* Matrix Green */
+    --bg-color: #0d0208 !important;
+    --window-bg: #1a1a1a !important;
+    --header-bg: #003b00 !important;
+    --border-color: #00ff41 !important;
+    --shadow-color: rgba(0, 255, 65, 0.5) !important;
+    --accent-color: #00ff41 !important;
+}
+
+.hacker-mode-active body {
+    background-color: #0d0208 !important;
+    color: #00ff41 !important;
+}
+
+.hacker-mode-active .retro-window {
+    box-shadow: 4px 4px 15px rgba(0, 255, 65, 0.3) !important;
+}
+
+.hacker-mode-active img {
+    filter: sepia(100%) hue-rotate(80deg) brightness(0.8) contrast(1.2) !important;
+}
+
+/* Scanlines Effect */
+.scanlines-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.25) 50%),
+        linear-gradient(90deg,
+            rgba(255, 0, 0, 0.06),
+            rgba(0, 255, 0, 0.02),
+            rgba(0, 0, 255, 0.06));
+    background-size: 100% 4px, 3px 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.15;
+}
+
+/* CRT Flicker */
+@keyframes flicker {
+    0% {
+        opacity: 0.27861;
+    }
+
+    5% {
+        opacity: 0.34769;
+    }
+
+    10% {
+        opacity: 0.23604;
+    }
+
+    /* ... more points for better flicker ... */
+    100% {
+        opacity: 0.27861;
+    }
+}
+
+.crt-flicker {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(18, 16, 16, 0.03);
+    pointer-events: none;
+    z-index: 9998;
+    animation: flicker 0.1s infinite;
+}

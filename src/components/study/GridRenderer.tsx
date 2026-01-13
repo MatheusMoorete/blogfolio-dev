@@ -4,6 +4,8 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import type { StudyNote, ContentBlock } from '../../types/study-notes';
 import Window from '../Window';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface GridRendererProps {
     note: StudyNote;
@@ -17,8 +19,14 @@ const BlockRenderer: React.FC<{ block: ContentBlock }> = ({ block }) => {
         case 'markdown':
         case 'text':
             return (
-                <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.6', height: '100%', overflowY: 'auto' }}>
-                    {block.content || <em style={{ color: '#888' }}>Empty text block...</em>}
+                <div className="markdown-content" style={{ height: '100%', overflowY: 'auto' }}>
+                    {block.content ? (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {block.content}
+                        </ReactMarkdown>
+                    ) : (
+                        <em style={{ color: '#888' }}>Empty text block...</em>
+                    )}
                 </div>
             );
         case 'code':
@@ -63,8 +71,12 @@ const BlockRenderer: React.FC<{ block: ContentBlock }> = ({ block }) => {
 };
 
 const GridRenderer: React.FC<GridRendererProps> = ({ note, isEditable = false, onLayoutChange, onBlockClick }) => {
-    // Basic 12-column grid layout configuration
-    const layout = note.layout;
+    // Force items to be static when not in editable mode
+    const layout = note.layout.map(item => ({
+        ...item,
+        static: !isEditable
+    }));
+
     const RGL = GridLayout as any;
 
     return (
@@ -74,10 +86,11 @@ const GridRenderer: React.FC<GridRendererProps> = ({ note, isEditable = false, o
                 layout={layout}
                 cols={12}
                 rowHeight={30}
-                width={1000} // This should be dynamic based on container width
+                width={1200} // Fixed width or container width
                 isDraggable={isEditable}
                 isResizable={isEditable}
                 onLayoutChange={onLayoutChange}
+                useCSSTransforms={true}
             >
                 {layout.map(item => {
                     const block = note.blocks[item.i];
