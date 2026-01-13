@@ -26,6 +26,7 @@ export interface StudyNote {
     slug: string;
     title: string;
     description: string;
+    imageUrl?: string;
     category: string; // Maps to folder structure
     tags: string[];
     createdAt: string;
