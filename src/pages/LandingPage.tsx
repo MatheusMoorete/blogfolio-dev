@@ -8,11 +8,49 @@ import './LandingPage.css';
 import heroImg from '../assets/soueu.webp';
 import syncmanagerImg from '../assets/syncmanager.png';
 import unitaskImg from '../assets/unitask.png';
+import { supabase } from '../lib/supabase';
+import type { StudyNote } from '../types/study-notes';
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { t } = useTranslation();
+    const [recentPosts, setRecentPosts] = React.useState<StudyNote[]>([]);
+    const [loadingPosts, setLoadingPosts] = React.useState(true);
+
+    React.useEffect(() => {
+        fetchRecentPosts();
+    }, []);
+
+    const fetchRecentPosts = async () => {
+        setLoadingPosts(true);
+        const { data, error } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('status', 'published')
+            .order('created_at', { ascending: false })
+            .limit(3);
+
+        if (error) {
+            console.error('Error fetching recent posts:', error);
+        } else if (data) {
+            const mappedPosts = data.map(post => ({
+                id: post.id,
+                slug: post.slug,
+                title: post.title,
+                description: post.description || '',
+                imageUrl: post.content?.image_url || '',
+                category: post.category || 'geral',
+                tags: post.tags || [],
+                createdAt: post.created_at,
+                updatedAt: post.updated_at,
+                layout: post.content.layout || [],
+                blocks: post.content.blocks || {},
+            }));
+            setRecentPosts(mappedPosts);
+        }
+        setLoadingPosts(false);
+    };
 
     React.useEffect(() => {
         if (location.hash) {
@@ -159,19 +197,31 @@ const LandingPage: React.FC = () => {
                     <h2>{t('fromBlog')}</h2>
                     <a href="/blog" onClick={(e) => { e.preventDefault(); navigate('/blog'); }} style={{ textDecoration: 'underline', fontSize: '0.9rem' }}>{t('viewAll')}</a>
                 </div>
-                <div className="blog-preview-grid">
-                    {[
-                        { title: 'Computer Arch', id: 'computer-architecture-101' },
-                        { title: 'Operating Systems', id: 'operating-systems-design' },
-                        { title: 'Data Structures', id: 'data-structures-in-modern-apps' }
-                    ].map((post, i) => (
-                        <Window key={i} title={`post-0${i + 1}.pdf`} style={{ cursor: 'pointer' }}>
-                            <div onClick={() => navigate(`/blog/${post.id}`)}>
-                                <div style={{ height: '100px', background: '#f5f5f5', marginBottom: '0.5rem' }}></div>
-                                <h4 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>{post.title}</h4>
-                            </div>
-                        </Window>
-                    ))}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                    {loadingPosts ? (
+                        <p>Carregando posts recentes...</p>
+                    ) : recentPosts.length === 0 ? (
+                        <p>Nenhum post publicado ainda.</p>
+                    ) : (
+                        recentPosts.map((post) => (
+                            <Window key={post.id} title={`${post.createdAt.split('T')[0]}-${post.slug}.md`} style={{ cursor: 'pointer' }}>
+                                <div onClick={() => navigate(`/blog/${post.slug}`)}>
+                                    <div style={{
+                                        height: '150px',
+                                        background: post.imageUrl ? `url(${post.imageUrl}) #f5f5f5` : '#f5f5f5',
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                        marginBottom: '0.5rem',
+                                        borderBottom: '1px solid #eee'
+                                    }}></div>
+                                    <h4 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', padding: '0 0.5rem' }}>{post.title}</h4>
+                                    <p style={{ fontSize: '0.9rem', color: '#666', padding: '0 0.5rem 1rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                        {post.description}
+                                    </p>
+                                </div>
+                            </Window>
+                        ))
+                    )}
                 </div>
             </section>
 

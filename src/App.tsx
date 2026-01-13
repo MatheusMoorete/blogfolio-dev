@@ -7,6 +7,9 @@ import NoteEditor from './components/study/NoteEditor';
 import StudyNoteViewer from './components/study/StudyNoteViewer';
 import BSOD from './components/easter-eggs/BSOD';
 import Clippy from './components/easter-eggs/Clippy';
+import Login from './pages/admin/Login';
+import ProtectedRoute from './components/admin/ProtectedRoute';
+import AdminDashboard from './pages/admin/Dashboard';
 
 const App: React.FC = () => {
   const [showBSOD, setShowBSOD] = useState(false);
@@ -31,8 +34,31 @@ const App: React.FC = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:id" element={<StudyNoteViewer />} />
-          <Route path="/blog/editor" element={<NoteEditor />} />
-          <Route path="/blog/editor/:id" element={<NoteEditor />} />
+          <Route path="/admin" element={<Login />} />
+          <Route
+            path="/admin/dashboard"
+            element={
+              <ProtectedRoute>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/blog/editor"
+            element={
+              <ProtectedRoute>
+                <NoteEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/blog/editor/:id"
+            element={
+              <ProtectedRoute>
+                <NoteEditor />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Layout>
     </BrowserRouter>
