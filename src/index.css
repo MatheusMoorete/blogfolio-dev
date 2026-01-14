@@ -69,8 +69,7 @@ body {
 .section-highlight {
   width: 100%;
   position: relative;
-  /* Use negative margin to pull background behind previous section */
-  margin-top: -120px;
+  margin-top: -90px;
   padding: 4rem 20px;
   padding-top: calc(4rem + 120px);
   border-bottom: 2px solid var(--border-color);
