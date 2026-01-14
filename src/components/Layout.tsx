@@ -16,10 +16,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             minHeight: '100vh',
             maxWidth: '1000px',
             margin: '0 auto',
-            padding: '0 20px'
+            padding: '0 20px',
+            boxSizing: 'border-box',
+            width: '100%'
         }}>
             <Navbar />
-            <main>
+            <main style={{ width: '100%', overflow: 'hidden' }}>
                 {children}
             </main>
             <footer style={{
@@ -28,7 +30,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 textAlign: 'center',
                 borderTop: '2px solid black',
                 fontFamily: 'var(--font-mono)',
-                fontSize: '0.8rem'
+                fontSize: '0.8rem',
+                width: '100%'
             }}>
                 {t('footer').replace('{year}', new Date().getFullYear().toString())}
             </footer>

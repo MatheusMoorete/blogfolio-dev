@@ -46,10 +46,10 @@ const StudyNoteViewer: React.FC = () => {
     if (!note) return <div style={{ padding: '50px', textAlign: 'center' }}>Ops! Post não encontrado. <Link to="/blog">Voltar ao Blog</Link></div>;
 
     return (
-        <div className="blog-post-view" style={{ padding: '1rem 0', maxWidth: '850px', margin: '0 auto', fontFamily: 'var(--font-mono)', fontSize: '0.9rem' }}>
+        <div className="blog-post-view" style={{ padding: '1rem 0', width: '100%', maxWidth: '850px', margin: '0 auto', fontFamily: 'var(--font-mono)', fontSize: '0.9rem', boxSizing: 'border-box' }}>
             <div style={{ marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.8rem', paddingLeft: '0', paddingRight: '1rem' }}>
                 <Link to="/blog" style={{ textDecoration: 'none', color: '#666', fontSize: '0.75rem', display: 'block', marginBottom: '0.5rem' }}>← Voltar para o Blog</Link>
-                <h1 style={{ fontSize: '1.8rem', marginBottom: '0.2rem', lineHeight: '1' }}>{note.title}</h1>
+                <h1 className="blog-article-title" style={{ marginBottom: '0.2rem', lineHeight: '1' }}>{note.title}</h1>
                 <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '0.4rem', lineHeight: '1.4' }}>{note.description}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
                     {note.tags.map(tag => (
@@ -61,7 +61,7 @@ const StudyNoteViewer: React.FC = () => {
                 </div>
             </div>
 
-            <div style={{ background: '#fff', padding: '0' }}>
+            <div style={{ background: '#fff', padding: '0', width: '100%', overflow: 'hidden' }}>
                 <GridRenderer note={note} isEditable={false} />
             </div>
 
@@ -73,9 +73,12 @@ const StudyNoteViewer: React.FC = () => {
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.75rem',
                 opacity: 1,
-                userSelect: 'none'
+                userSelect: 'none',
+                width: '100%',
+                boxSizing: 'border-box',
+                overflowX: 'auto'
             }}>
-                <pre style={{ display: 'inline-block', textAlign: 'center', lineHeight: '1.2' }}>
+                <pre style={{ display: 'inline-block', textAlign: 'center', lineHeight: '1.2', margin: '0 auto', minWidth: 'min-content' }}>
                     {`__________________________________________________________________
 [ EOF - END OF FILE ]
 __________________________________________________________________`}

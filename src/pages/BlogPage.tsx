@@ -61,7 +61,7 @@ const BlogPage: React.FC = () => {
     }, []);
 
     return (
-        <div className="blog-page" style={{ padding: '0 20px', maxWidth: '1000px', margin: '0 auto', paddingTop: '2rem' }}>
+        <div className="blog-page-container">
             <div style={{ marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h1 style={{ margin: 0 }}>{t('blogTitle')}</h1>
@@ -69,12 +69,12 @@ const BlogPage: React.FC = () => {
                         Painel Admin
                     </button>
                 </div>
-                <p style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '1.1rem', maxWidth: '800px' }}>
+                <p className="blog-page-subtitle" style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '1.1rem', maxWidth: '800px' }}>
                     {t('blogSubtitle')}
                 </p>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+            <div className="blog-post-list">
                 {loading ? (
                     <p>Conectando ao banco de dados...</p>
                 ) : posts.length === 0 ? (
@@ -82,8 +82,9 @@ const BlogPage: React.FC = () => {
                 ) : (
                     posts.map((post) => (
                         <Window key={post.id} title={`${post.createdAt.split('T')[0]}-${post.slug}.md`}>
-                            <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                            <div className="blog-post-card">
                                 <div
+                                    className="blog-post-image"
                                     style={{
                                         width: '200px',
                                         height: '120px',
@@ -96,20 +97,21 @@ const BlogPage: React.FC = () => {
                                         justifyContent: 'center',
                                         fontWeight: 'bold',
                                         color: '#888',
-                                        border: '1px solid #ddd'
+                                        border: '1px solid #ddd',
+                                        flexShrink: 0
                                     }}
                                     onClick={() => navigate(`/blog/${post.slug}`)}
                                 >
                                     {!post.imageUrl && '[ BLOG POST ]'}
                                 </div>
-                                <div style={{ flex: 1, minWidth: '300px' }}>
-                                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', cursor: 'pointer' }} onClick={() => navigate(`/blog/${post.slug}`)}>{post.title}</h2>
-                                    <p style={{ color: '#666', marginBottom: '1rem' }}>
+                                <div className="blog-post-content">
+                                    <h2 className="blog-post-title" onClick={() => navigate(`/blog/${post.slug}`)}>{post.title}</h2>
+                                    <p className="blog-post-description">
                                         {post.description}
                                     </p>
-                                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                                    <div className="blog-tags">
                                         {post.tags.map(tag => (
-                                            <span key={tag} style={{ background: '#eee', padding: '2px 8px', borderRadius: '4px', fontSize: '0.9rem' }}>#{tag}</span>
+                                            <span key={tag} className="blog-tag">#{tag}</span>
                                         ))}
                                     </div>
                                     <button className="retro-button" onClick={() => navigate(`/blog/${post.slug}`)}>{t('readEntry') || 'Ler'}</button>
