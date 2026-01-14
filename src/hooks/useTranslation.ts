@@ -20,7 +20,8 @@ const translations = {
     readEntry: "Ler entrada",
     viewDetails: "Ver Detalhes",
     footer: "© {year} Retro Portfolio - Criado para treinar e armazenar conhecimentos",
-    blogTitle: "Blog de Engenharia da Computação",
+    blogTitle: "Blog",
+    blogSubtitle: "Aqui eu compartilho o que estou lendo e estudando no momento para ajudar na fixação e documentar minha evolução na engenharia.",
     endEntry: "Fim da entrada"
 };
 

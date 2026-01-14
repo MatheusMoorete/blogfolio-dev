@@ -62,11 +62,16 @@ const BlogPage: React.FC = () => {
 
     return (
         <div className="blog-page" style={{ padding: '0 20px', maxWidth: '1000px', margin: '0 auto', paddingTop: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ margin: 0 }}>{t('blogTitle')}</h1>
-                <button className="retro-button" onClick={() => navigate('/admin/dashboard')}>
-                    Painel Admin
-                </button>
+            <div style={{ marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <h1 style={{ margin: 0 }}>{t('blogTitle')}</h1>
+                    <button className="retro-button" onClick={() => navigate('/admin/dashboard')}>
+                        Painel Admin
+                    </button>
+                </div>
+                <p style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '1.1rem', maxWidth: '800px' }}>
+                    {t('blogSubtitle')}
+                </p>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

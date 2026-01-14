@@ -6,14 +6,15 @@ import BlogPage from './pages/BlogPage';
 import NoteEditor from './components/study/NoteEditor';
 import StudyNoteViewer from './components/study/StudyNoteViewer';
 import BSOD from './components/easter-eggs/BSOD';
-import Clippy from './components/easter-eggs/Clippy';
 import Login from './pages/admin/Login';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import AdminDashboard from './pages/admin/Dashboard';
 import HackerMode from './components/easter-eggs/HackerMode';
+import CRTFilter from './components/effects/CRTFilter';
 
 const App: React.FC = () => {
   const [showBSOD, setShowBSOD] = useState(false);
+  const [crtEnabled, setCrtEnabled] = useState(false);
 
   useEffect(() => {
     const handleBSOD = () => setShowBSOD(true);
@@ -29,8 +30,8 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <HackerMode />
+      <CRTFilter enabled={crtEnabled} />
       {showBSOD && <BSOD onComplete={handleRestart} />}
-      {!showBSOD && <Clippy />}
       <Layout>
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -63,6 +64,26 @@ const App: React.FC = () => {
           />
         </Routes>
       </Layout>
+      <button
+        onClick={() => setCrtEnabled(!crtEnabled)}
+        style={{
+          position: 'fixed',
+          bottom: '10px',
+          left: '10px',
+          zIndex: 10001,
+          background: crtEnabled ? '#00ff41' : '#333',
+          color: crtEnabled ? '#000' : '#fff',
+          border: '1px solid #777',
+          padding: '4px 8px',
+          fontSize: '0.7rem',
+          fontFamily: 'monospace',
+          cursor: 'pointer',
+          borderRadius: '2px',
+          boxShadow: '2px 2px 0 #000'
+        }}
+      >
+        CRT: {crtEnabled ? 'ON' : 'OFF'}
+      </button>
     </BrowserRouter>
   );
 };

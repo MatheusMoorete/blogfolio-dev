@@ -11,6 +11,8 @@ import unitaskImg from '../assets/unitask.png';
 import { supabase } from '../lib/supabase';
 import type { StudyNote, ContentBlock, GridLayoutItem } from '../types/study-notes';
 
+import Clippy from '../components/easter-eggs/Clippy';
+
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -82,6 +84,7 @@ const LandingPage: React.FC = () => {
 
     return (
         <div className="landing-page">
+            <Clippy />
             {/* Hero Section */}
             <section className="hero-section">
                 <div className="hero-content">
@@ -251,19 +254,9 @@ const LandingPage: React.FC = () => {
                             href="https://www.linkedin.com/in/matheus-moorete/"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="contact-link"
-                            onMouseEnter={e => {
-                                (e.currentTarget as HTMLAnchorElement).style.background = '#0077B5';
-                                (e.currentTarget as HTMLAnchorElement).style.color = 'white';
-                                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#0077B5';
-                            }}
-                            onMouseLeave={e => {
-                                (e.currentTarget as HTMLAnchorElement).style.background = '#f0f0f0';
-                                (e.currentTarget as HTMLAnchorElement).style.color = 'black';
-                                (e.currentTarget as HTMLAnchorElement).style.borderColor = 'black';
-                            }}
+                            className="contact-link linkedin"
                         >
-                            <Linkedin size={24} />
+                            <Linkedin size={24} className="linkedin-icon" />
                             <div style={{ overflow: 'hidden' }}>
                                 <div style={{ fontWeight: 'bold' }}>LinkedIn</div>
                                 <div style={{ fontSize: '0.8rem', opacity: 0.8, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>@matheus-moorete</div>
@@ -275,19 +268,9 @@ const LandingPage: React.FC = () => {
                             href="https://github.com/MatheusMoorete"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="contact-link"
-                            onMouseEnter={e => {
-                                (e.currentTarget as HTMLAnchorElement).style.background = '#24292e';
-                                (e.currentTarget as HTMLAnchorElement).style.color = 'white';
-                                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#24292e';
-                            }}
-                            onMouseLeave={e => {
-                                (e.currentTarget as HTMLAnchorElement).style.background = '#f0f0f0';
-                                (e.currentTarget as HTMLAnchorElement).style.color = 'black';
-                                (e.currentTarget as HTMLAnchorElement).style.borderColor = 'black';
-                            }}
+                            className="contact-link github"
                         >
-                            <Github size={24} />
+                            <Github size={24} className="github-icon" />
                             <div style={{ overflow: 'hidden' }}>
                                 <div style={{ fontWeight: 'bold' }}>GitHub</div>
                                 <div style={{ fontSize: '0.8rem', opacity: 0.8, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>@MatheusMoorete</div>
@@ -297,19 +280,9 @@ const LandingPage: React.FC = () => {
                         {/* Email */}
                         <a
                             href="mailto:matheus.moorete@gmail.com"
-                            className="contact-link"
-                            onMouseEnter={e => {
-                                (e.currentTarget as HTMLAnchorElement).style.background = '#D44638';
-                                (e.currentTarget as HTMLAnchorElement).style.color = 'white';
-                                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#D44638';
-                            }}
-                            onMouseLeave={e => {
-                                (e.currentTarget as HTMLAnchorElement).style.background = '#f0f0f0';
-                                (e.currentTarget as HTMLAnchorElement).style.color = 'black';
-                                (e.currentTarget as HTMLAnchorElement).style.borderColor = 'black';
-                            }}
+                            className="contact-link email"
                         >
-                            <Mail size={24} />
+                            <Mail size={24} className="email-icon" />
                             <div style={{ overflow: 'hidden' }}>
                                 <div style={{ fontWeight: 'bold' }}>Email</div>
                                 <div style={{ fontSize: '0.8rem', opacity: 0.8, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>matheus.moorete@gmail.com</div>

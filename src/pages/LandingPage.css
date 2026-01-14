@@ -132,9 +132,22 @@
   text-decoration: none;
   color: black;
   background: #f0f0f0;
-  transition: all 0.2s;
   flex: 1;
   min-width: 0;
+  box-shadow: 2px 2px 0 black;
+}
+
+/* Specific icon colors */
+.contact-link .linkedin-icon {
+  color: #0077B5;
+}
+
+.contact-link .github-icon {
+  color: #24292e;
+}
+
+.contact-link .email-icon {
+  color: #D44638;
 }
 
 /* Responsive Styles */
@@ -145,6 +158,7 @@
 }
 
 @media (max-width: 768px) {
+
   /* Hero */
   .hero-section {
     flex-direction: column-reverse;
@@ -158,7 +172,8 @@
     flex-direction: column;
   }
 
-  .hero-title, .hero-subtitle {
+  .hero-title,
+  .hero-subtitle {
     font-size: 1.8rem;
   }
 
@@ -181,10 +196,12 @@
 
 @media (max-width: 480px) {
   .quick-links-grid {
-    grid-template-columns: 1fr; /* Stack links on very small screens */
+    grid-template-columns: 1fr;
+    /* Stack links on very small screens */
   }
 
-  .hero-title, .hero-subtitle {
+  .hero-title,
+  .hero-subtitle {
     font-size: 1.5rem;
   }
 }

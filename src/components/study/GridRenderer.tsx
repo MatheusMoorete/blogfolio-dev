@@ -14,12 +14,12 @@ interface GridRendererProps {
     onBlockClick?: (blockId: string) => void;
 }
 
-const BlockRenderer: React.FC<{ block: ContentBlock }> = ({ block }) => {
+const BlockRenderer: React.FC<{ block: ContentBlock; isEditable?: boolean }> = ({ block, isEditable }) => {
     switch (block.type) {
         case 'markdown':
         case 'text':
             return (
-                <div className="markdown-content" style={{ height: '100%', overflowY: 'auto' }}>
+                <div className="markdown-content" style={{ height: isEditable ? '100%' : 'auto', overflowY: isEditable ? 'auto' : 'visible' }}>
                     {block.content ? (
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {block.content}
@@ -37,8 +37,8 @@ const BlockRenderer: React.FC<{ block: ContentBlock }> = ({ block }) => {
                     padding: '1rem',
                     borderRadius: '4px',
                     fontFamily: 'monospace',
-                    height: '100%',
-                    overflow: 'auto',
+                    height: isEditable ? '100%' : 'auto',
+                    overflow: isEditable ? 'auto' : 'visible',
                     border: '1px solid #333'
                 }}>
                     <div style={{
@@ -77,32 +77,66 @@ const GridRenderer: React.FC<GridRendererProps> = ({ note, isEditable = false, o
         static: !isEditable
     }));
 
+    // Compact layout for reading mode to remove empty space at the top
+    let finalLayout = layout;
+    if (!isEditable && layout.length > 0) {
+        const minY = Math.min(...layout.map(i => i.y));
+        if (minY > 0) {
+            finalLayout = layout.map(item => ({
+                ...item,
+                y: item.y - minY
+            }));
+        }
+    }
+
     const RGL = GridLayout as any;
+
+    if (!isEditable) {
+        // In reading mode, we use a natural flow layout so content pushes the footer down
+        // We sort by y then x to maintain the intended reading order
+        const sortedLayout = [...finalLayout].sort((a, b) => a.y - b.y || a.x - b.x);
+
+        return (
+            <div className="study-note-grid-view" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
+                {sortedLayout.map(item => {
+                    const block = note.blocks[item.i];
+                    return block ? (
+                        <div key={item.i} style={{ width: '100%' }}>
+                            <BlockRenderer block={block} isEditable={false} />
+                        </div>
+                    ) : null;
+                })}
+            </div>
+        );
+    }
 
     return (
         <div className="study-note-grid">
             <RGL
                 className="layout"
-                layout={layout}
+                layout={finalLayout}
                 cols={12}
                 rowHeight={30}
-                width={1200} // Fixed width or container width
+                width={850}
                 isDraggable={isEditable}
                 isResizable={isEditable}
                 onLayoutChange={onLayoutChange}
                 useCSSTransforms={true}
+                margin={[0, 0]}
+                containerPadding={[0, 0]}
+                autoSize={true}
             >
-                {layout.map(item => {
+                {finalLayout.map(item => {
                     const block = note.blocks[item.i];
                     return (
-                        <div key={item.i} style={{ height: '100%' }} onClick={() => isEditable && onBlockClick?.(item.i)}>
+                        <div key={item.i} style={{ height: isEditable ? '100%' : 'auto' }} onClick={() => isEditable && onBlockClick?.(item.i)}>
                             {isEditable ? (
                                 <Window title={`${block?.type || 'block'}.files`} style={{ height: '100%', cursor: 'grab' }} contentStyle={{ height: 'calc(100% - 32px)', overflow: 'hidden' }}>
-                                    {block ? <BlockRenderer block={block} /> : <div>Block data missing</div>}
+                                    {block ? <BlockRenderer block={block} isEditable={true} /> : <div>Block data missing</div>}
                                 </Window>
                             ) : (
-                                <div style={{ height: '100%', padding: '10px' }}>
-                                    {block ? <BlockRenderer block={block} /> : null}
+                                <div style={{ height: 'auto', padding: '0' }}>
+                                    {block ? <BlockRenderer block={block} isEditable={false} /> : null}
                                 </div>
                             )}
                         </div>

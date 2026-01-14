@@ -46,28 +46,40 @@ const StudyNoteViewer: React.FC = () => {
     if (!note) return <div style={{ padding: '50px', textAlign: 'center' }}>Ops! Post não encontrado. <Link to="/blog">Voltar ao Blog</Link></div>;
 
     return (
-        <div style={{ padding: '2rem', maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ marginBottom: '3rem', borderBottom: '1px solid #eee', paddingBottom: '2rem' }}>
-                <Link to="/blog" style={{ textDecoration: 'none', color: '#666', fontSize: '0.9rem', display: 'block', marginBottom: '1rem' }}>← Voltar para o Blog</Link>
-                <h1 style={{ fontSize: '3rem', fontFamily: 'var(--font-sans)', marginBottom: '1rem' }}>{note.title}</h1>
-                <p style={{ fontSize: '1.2rem', color: '#555', marginBottom: '1.5rem', lineHeight: '1.6' }}>{note.description}</p>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+        <div className="blog-post-view" style={{ padding: '1rem 0', maxWidth: '850px', margin: '0 auto', fontFamily: 'var(--font-mono)', fontSize: '0.9rem' }}>
+            <div style={{ marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.8rem', paddingLeft: '0', paddingRight: '1rem' }}>
+                <Link to="/blog" style={{ textDecoration: 'none', color: '#666', fontSize: '0.75rem', display: 'block', marginBottom: '0.5rem' }}>← Voltar para o Blog</Link>
+                <h1 style={{ fontSize: '1.8rem', marginBottom: '0.2rem', lineHeight: '1' }}>{note.title}</h1>
+                <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '0.4rem', lineHeight: '1.4' }}>{note.description}</p>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
                     {note.tags.map(tag => (
-                        <span key={tag} style={{ background: '#f0f0f0', padding: '4px 12px', borderRadius: '20px', fontSize: '0.8rem' }}>#{tag}</span>
+                        <span key={tag} style={{ background: '#f0f0f0', padding: '2px 10px', borderRadius: '20px', fontSize: '0.7rem' }}>#{tag}</span>
                     ))}
                 </div>
-                <div style={{ fontSize: '0.9rem', color: '#999' }}>
+                <div style={{ fontSize: '0.75rem', color: '#999' }}>
                     {new Date(note.createdAt).toLocaleDateString('pt-BR')} • {note.category.toUpperCase()}
                 </div>
             </div>
 
-            <div style={{ background: '#fff', padding: '1rem' }}>
+            <div style={{ background: '#fff', padding: '0' }}>
                 <GridRenderer note={note} isEditable={false} />
             </div>
 
-            <div style={{ marginTop: '5rem', padding: '3rem 1rem', borderTop: '2px dashed #ccc', textAlign: 'center', color: '#bbb', fontSize: '0.9rem' }}>
-                <p>Obrigado por ler este conteúdo! 🚀</p>
-                <p style={{ marginTop: '0.5rem' }}>Desenvolvido com carinho no meu Blog-folio.</p>
+            <div style={{
+                marginTop: '4rem',
+                padding: '2rem 1rem',
+                textAlign: 'center',
+                color: '#000',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.75rem',
+                opacity: 1,
+                userSelect: 'none'
+            }}>
+                <pre style={{ display: 'inline-block', textAlign: 'center', lineHeight: '1.2' }}>
+                    {`__________________________________________________________________
+[ EOF - END OF FILE ]
+__________________________________________________________________`}
+                </pre>
             </div>
         </div>
     );
