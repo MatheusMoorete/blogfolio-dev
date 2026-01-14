@@ -69,19 +69,20 @@ body {
 .section-highlight {
   width: 100%;
   position: relative;
-  /* Remove the 50vw margin hack causing overflow */
-  margin-top: -90px;
+  /* Use negative margin to pull background behind previous section */
+  margin-top: -120px;
   padding: 4rem 20px;
-  padding-top: calc(4rem + 90px);
+  padding-top: calc(4rem + 120px);
   border-bottom: 2px solid var(--border-color);
   z-index: 0;
   box-sizing: border-box;
+  min-height: 100vh;
 }
 
 @media (min-width: 1040px) {
   .section-highlight {
     padding: 4rem calc((100vw - 1000px) / 2 + 20px);
-    padding-top: calc(4rem + 90px);
+    padding-top: calc(4rem + 120px);
     width: 100vw;
     left: 50%;
     right: 50%;
