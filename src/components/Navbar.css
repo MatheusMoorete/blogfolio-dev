@@ -2,6 +2,15 @@
   margin-bottom: 2rem;
 }
 
+/* Ensure full width on mobile/tablet by breaking out of layout padding */
+@media (max-width: 1039px) {
+  .navbar-wrapper {
+    width: calc(100% + (2 * var(--layout-padding, 20px)));
+    margin-left: calc(-1 * var(--layout-padding, 20px));
+    margin-right: calc(-1 * var(--layout-padding, 20px));
+  }
+}
+
 .navbar-container {
   display: flex;
   gap: 1.5rem;

@@ -86,19 +86,9 @@ const BlogPage: React.FC = () => {
                                 <div
                                     className="blog-post-image"
                                     style={{
-                                        width: '200px',
-                                        height: '120px',
                                         background: post.imageUrl ? `url(${post.imageUrl}) #f5f5f5` : '#e0e0e0',
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        fontWeight: 'bold',
-                                        color: '#888',
-                                        border: '1px solid #ddd',
-                                        flexShrink: 0
                                     }}
                                     onClick={() => navigate(`/blog/${post.slug}`)}
                                 >
