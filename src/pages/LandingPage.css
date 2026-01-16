@@ -72,6 +72,20 @@
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
+  transition: all 0.1s;
+}
+
+.quick-link-item:hover {
+  background-color: #fafafa;
+}
+
+.quick-link-item:active {
+  background-color: #e0e0e0;
+  box-shadow: inset 3px 3px 0px #000000;
+  padding-left: 17px;
+  padding-top: 17px;
+  padding-right: 13px;
+  padding-bottom: 13px;
 }
 
 /* Projects Section */

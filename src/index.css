@@ -11,6 +11,7 @@
   --accent-color: #000000;
   --font-sans: 'IBM Plex Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+  --layout-padding: 20px;
 }
 
 * {
@@ -26,7 +27,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Retro Scrollbar Styling - Classic OS Style */
 ::-webkit-scrollbar {
   width: 16px;
   height: 16px;
@@ -67,10 +67,12 @@ body {
 }
 
 .section-highlight {
-  width: 100%;
+  width: calc(100% + (2 * var(--layout-padding)));
   position: relative;
   margin-top: -90px;
-  padding: 4rem 20px;
+  margin-left: calc(-1 * var(--layout-padding));
+  margin-right: calc(-1 * var(--layout-padding));
+  padding: 4rem var(--layout-padding);
   padding-top: calc(4rem + 120px);
   border-bottom: 2px solid var(--border-color);
   z-index: 0;
@@ -81,7 +83,7 @@ body {
 @media (min-width: 1040px) {
   .section-highlight {
     padding: 4rem calc((100vw - 1000px) / 2 + 20px);
-    padding-top: calc(4rem + 120px);
+    padding-top: calc(0rem + 120px);
     width: 100vw;
     left: 50%;
     right: 50%;
@@ -135,7 +137,6 @@ h4,
 h5,
 h6 {
   font-weight: 700;
-  /* text-transform: uppercase; */
   letter-spacing: -0.02em;
 }
 
@@ -144,7 +145,6 @@ a {
   text-decoration: none;
 }
 
-/* Base Retro Window Styles */
 .retro-window {
   background: var(--window-bg);
   border: var(--border-width) solid var(--border-color);
@@ -192,7 +192,7 @@ a {
   padding: 16px;
 }
 
-/* Button Styles */
+
 .retro-button {
   background: white;
   border: var(--border-width) solid var(--border-color);
@@ -213,14 +213,13 @@ a {
   background: #f0f0f0;
 }
 
-/* Specific overrides for hero image */
+
 .hero-image .retro-window-content {
   padding: 0;
   background: black;
   display: flex;
 }
 
-/* Markdown Styles */
 .markdown-content {
   line-height: 1.6;
 }
