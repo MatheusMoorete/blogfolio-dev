@@ -24,7 +24,7 @@ const Login: React.FC = () => {
             setError(error.message);
             setLoading(false);
         } else {
-            navigate('/blog/editor');
+            navigate('/admin/dashboard');
         }
     };
 

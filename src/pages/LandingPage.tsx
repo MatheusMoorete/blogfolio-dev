@@ -27,6 +27,7 @@ const LandingPage: React.FC = () => {
                 .from('posts')
                 .select('*')
                 .eq('status', 'published')
+                .order('pin_position', { ascending: true, nullsFirst: false })
                 .order('created_at', { ascending: false })
                 .limit(3);
 
@@ -40,6 +41,7 @@ const LandingPage: React.FC = () => {
                     description?: string;
                     category?: string;
                     tags?: string[];
+                    pin_position: number | null;
                     created_at: string;
                     updated_at: string;
                     content: {
@@ -57,6 +59,7 @@ const LandingPage: React.FC = () => {
                     imageUrl: post.content?.image_url || '',
                     category: post.category || 'geral',
                     tags: post.tags || [],
+                    pinPosition: post.pin_position,
                     createdAt: post.created_at,
                     updatedAt: post.updated_at,
                     layout: post.content.layout || [],

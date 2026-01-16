@@ -21,6 +21,7 @@ const NoteEditor: React.FC = () => {
         description: '',
         category: 'geral',
         tags: [],
+        pinPosition: null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         layout: [],
@@ -79,6 +80,7 @@ const NoteEditor: React.FC = () => {
                 description: data.description || '',
                 category: data.category || 'geral',
                 tags: data.tags || [],
+                pinPosition: data.pin_position,
                 createdAt: data.created_at,
                 updatedAt: data.updated_at,
                 layout: data.content.layout || [],
@@ -110,6 +112,7 @@ const NoteEditor: React.FC = () => {
             description: note.description,
             category: note.category,
             tags: note.tags,
+            pin_position: note.pinPosition,
             status: status,
             content: {
                 layout: note.layout,
@@ -278,6 +281,19 @@ const NoteEditor: React.FC = () => {
                     />
                     <small style={{ fontSize: '0.7rem', color: '#666', marginTop: '0.2rem', display: 'block' }}>
                     </small>
+                </div>
+                <div style={{ width: '120px' }}>
+                    <label style={{ fontSize: '0.8rem', display: 'block' }}>Fixar (Pin):</label>
+                    <select
+                        value={note.pinPosition || ''}
+                        onChange={e => setNote(prev => ({ ...prev, pinPosition: e.target.value ? parseInt(e.target.value) : null }))}
+                        style={{ width: '100%', padding: '0.3rem', border: '1px solid #ccc' }}
+                    >
+                        <option value="">Nenhum</option>
+                        <option value="1">Pin 1 (Esquerda)</option>
+                        <option value="2">Pin 2 (Meio)</option>
+                        <option value="3">Pin 3 (Direita)</option>
+                    </select>
                 </div>
             </div>
 

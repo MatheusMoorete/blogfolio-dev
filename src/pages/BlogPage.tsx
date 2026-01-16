@@ -32,6 +32,7 @@ const BlogPage: React.FC = () => {
                     description?: string;
                     category?: string;
                     tags?: string[];
+                    pin_position: number | null;
                     created_at: string;
                     updated_at: string;
                     content: {
@@ -45,11 +46,11 @@ const BlogPage: React.FC = () => {
                     id: post.id,
                     slug: post.slug,
                     title: post.title,
-                    subtitle: post.subtitle || '',
                     description: post.description || '',
                     imageUrl: post.content?.image_url || '',
                     category: post.category || 'geral',
                     tags: post.tags || [],
+                    pinPosition: post.pin_position,
                     createdAt: post.created_at,
                     updatedAt: post.updated_at,
                     layout: post.content.layout || [],
@@ -68,9 +69,6 @@ const BlogPage: React.FC = () => {
             <div style={{ marginBottom: '2rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h1 style={{ margin: 0 }}>{t('blogTitle')}</h1>
-                    <button className="retro-button" onClick={() => navigate('/admin/dashboard')}>
-                        Painel Admin
-                    </button>
                 </div>
                 <p className="blog-page-subtitle" style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '1.1rem', maxWidth: '800px' }}>
                     {t('blogSubtitle')}

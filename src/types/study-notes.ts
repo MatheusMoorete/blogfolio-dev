@@ -30,6 +30,7 @@ export interface StudyNote {
     imageUrl?: string;
     category: string; // Maps to folder structure
     tags: string[];
+    pinPosition: number | null;
     createdAt: string;
     updatedAt: string;
     layout: GridLayoutItem[]; // Coordinates for the grid
