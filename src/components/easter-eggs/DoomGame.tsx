@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 declare global {
     interface Window {
-        createDos: any;
+        Dos: any;
     }
 }
 
@@ -12,61 +12,54 @@ const DoomGame: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadResources = () => {
+        let dosInstance: any = null;
+
+        const loadScript = (src: string): Promise<void> => {
             return new Promise((resolve, reject) => {
-                if (window.createDos) {
-                    resolve(true);
+                if (document.querySelector(`script[src="${src}"]`)) {
+                    resolve();
                     return;
                 }
-
-                // Load CSS
-                const link = document.createElement('link');
-                link.rel = "stylesheet";
-                link.href = "https://v8.js-dos.com/latest/js-dos.css";
-                document.head.appendChild(link);
-
-                // Load JS
                 const script = document.createElement('script');
-                script.src = "https://v8.js-dos.com/latest/js-dos.js";
-                script.onload = () => resolve(true);
-                script.onerror = () => reject(new Error("Failed to load js-dos script"));
+                script.src = src;
+                script.onload = () => resolve();
+                script.onerror = () => reject(new Error('Failed to load script'));
                 document.head.appendChild(script);
             });
         };
 
-        let ci: any = null;
+        const loadCSS = (href: string): void => {
+            if (document.querySelector(`link[href="${href}"]`)) return;
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = href;
+            document.head.appendChild(link);
+        };
 
-        loadResources().then(() => {
-            if (containerRef.current && window.createDos) {
-                try {
-                    // js-dos v8 use createDos
-                    window.createDos(containerRef.current, {
-                        style: "hidden", // We want it simple
-                    }).then((instance: any) => {
-                        ci = instance;
-                        instance.run("https://v8.js-dos.com/bundles/doom.jsdos").then(() => {
-                            setLoading(false);
-                        }).catch((err: any) => {
-                            console.error("Game run error:", err);
-                            setError("Falha ao iniciar o jogo.");
-                        });
-                    }).catch((err: any) => {
-                        console.error("Dos creation error:", err);
-                        setError("Erro ao inicializar DOS.");
+        const initDoom = async () => {
+            try {
+                loadCSS('https://v8.js-dos.com/latest/js-dos.css');
+                await loadScript('https://v8.js-dos.com/latest/js-dos.js');
+
+                if (containerRef.current && window.Dos) {
+                    dosInstance = window.Dos(containerRef.current, {
+                        url: 'https://cdn.dos.zone/original/2X/2/24b00b14f118580763440ecaddcc948f8cb94f14.jsdos',
                     });
-                } catch (err) {
-                    console.error("Init crash:", err);
-                    setError("Crash na inicialização.");
+                    setLoading(false);
+                } else {
+                    setError('Falha ao inicializar Dos.');
                 }
+            } catch (err) {
+                console.error('Error initializing Doom:', err);
+                setError('Erro ao carregar js-dos.');
             }
-        }).catch((err) => {
-            console.error("Resource error:", err);
-            setError("Erro ao carregar assets.");
-        });
+        };
+
+        initDoom();
 
         return () => {
-            if (ci && ci.stop) {
-                ci.stop();
+            if (dosInstance && dosInstance.stop) {
+                dosInstance.stop();
             }
         };
     }, []);
@@ -74,32 +67,42 @@ const DoomGame: React.FC = () => {
     return (
         <div
             ref={containerRef}
+            id="dos"
             style={{
-                width: '300px',
+                width: '100%',
                 height: '200px',
                 background: '#000',
                 position: 'relative',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden'
             }}
         >
             {loading && !error && (
                 <div style={{
                     position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
                     color: '#00ff41',
                     fontFamily: 'monospace',
                     fontSize: '0.8rem',
                     textAlign: 'center',
                     zIndex: 10
                 }}>
-                    CARREGANDO DOOM.WAD...
+                    LOADING...
                 </div>
             )}
             {error && (
-                <div style={{ color: '#ff0000', fontFamily: 'monospace', fontSize: '0.7rem', padding: '10px' }}>
-                    [SYSTEM ERROR]: {error}
+                <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    color: '#ff0000',
+                    fontFamily: 'monospace',
+                    fontSize: '0.7rem',
+                    padding: '10px',
+                    textAlign: 'center'
+                }}>
+                    [ERROR]: {error}
                 </div>
             )}
         </div>
@@ -107,4 +110,3 @@ const DoomGame: React.FC = () => {
 };
 
 export default DoomGame;
-
