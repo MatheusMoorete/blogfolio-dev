@@ -73,6 +73,8 @@
   align-items: center;
   cursor: pointer;
   transition: all 0.1s;
+  font-family: var(--font-mono);
+  font-weight: bold;
 }
 
 .quick-link-item:hover {

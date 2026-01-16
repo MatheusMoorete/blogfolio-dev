@@ -20,6 +20,7 @@
 }
 
 .navbar-logo {
+  font-family: var(--font-mono);
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -46,6 +47,8 @@
 .navbar-link {
   text-decoration: none;
   color: inherit;
+  font-family: var(--font-mono);
+  font-weight: bold;
 }
 
 .navbar-toggle {
