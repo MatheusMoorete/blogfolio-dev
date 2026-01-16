@@ -28,6 +28,7 @@ const StudyNoteViewer: React.FC = () => {
                 description: data.description || '',
                 category: data.category || 'geral',
                 tags: data.tags || [],
+                pinPosition: data.pin_position,
                 createdAt: data.created_at,
                 updatedAt: data.updated_at,
                 layout: data.content.layout || [],

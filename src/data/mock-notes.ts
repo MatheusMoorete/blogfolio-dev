@@ -8,6 +8,7 @@ export const MOCK_NOTES: StudyNote[] = [
         description: 'Um mergulho profundo em useCallback e useMemo com exemplos práticos.',
         category: 'react',
         tags: ['hooks', 'performance', 'frontend'],
+        pinPosition: null,
         createdAt: '2026-01-10T10:00:00Z',
         updatedAt: '2026-01-11T14:30:00Z',
         layout: [
