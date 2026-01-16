@@ -41,7 +41,7 @@ const Navbar: React.FC = () => {
             <div className="navbar-container">
                 <Link to="/" onClick={handleLogoClick} className="navbar-logo">
                     <div className="navbar-logo-icon"></div>
-                    Blogfólio
+                    BLOGFÓLIO
                 </Link>
 
                 <button className="navbar-toggle" onClick={toggleMenu} aria-label="Toggle menu">
