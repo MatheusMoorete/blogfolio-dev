@@ -17,6 +17,7 @@ const NoteEditor: React.FC = () => {
         id: '',
         slug: '',
         title: 'Novo Post',
+        subtitle: '',
         description: '',
         category: 'geral',
         tags: [],
@@ -57,14 +58,6 @@ const NoteEditor: React.FC = () => {
         };
     }, [isDragging, dragStart]);
 
-    useEffect(() => {
-        if (id && id !== 'new-note') {
-            fetchPost(id);
-        } else {
-            setShowTemplateSelector(true);
-        }
-    }, [id]);
-
     const fetchPost = async (postId: string) => {
         setLoading(true);
         const { data, error } = await supabase
@@ -82,6 +75,7 @@ const NoteEditor: React.FC = () => {
                 id: data.id,
                 slug: data.slug,
                 title: data.title,
+                subtitle: data.subtitle || '',
                 description: data.description || '',
                 category: data.category || 'geral',
                 tags: data.tags || [],
@@ -96,10 +90,22 @@ const NoteEditor: React.FC = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        // Avoid synchronous setState in effect by wrapping in a microtask
+        Promise.resolve().then(() => {
+            if (id && id !== 'new-note') {
+                fetchPost(id);
+            } else {
+                setShowTemplateSelector(true);
+            }
+        });
+    }, [id]);
+
     const handleSave = async () => {
         setSaving(true);
         const postData = {
             title: note.title,
+            subtitle: note.subtitle,
             slug: note.slug || note.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, ''),
             description: note.description,
             category: note.category,
@@ -150,7 +156,7 @@ const NoteEditor: React.FC = () => {
         setShowTemplateSelector(false);
     };
 
-    const handleLayoutChange = (newLayout: any) => {
+    const handleLayoutChange = (newLayout: GridLayoutItem[]) => {
         setNote(prev => ({ ...prev, layout: newLayout }));
     };
 
@@ -201,12 +207,18 @@ const NoteEditor: React.FC = () => {
                         placeholder="Título do Post"
                         style={{ fontSize: '1.2rem', fontWeight: 'bold', border: 'none', borderBottom: '1px solid #ccc', outline: 'none', width: '300px' }}
                     />
+                    <input
+                        value={note.subtitle}
+                        onChange={e => setNote(prev => ({ ...prev, subtitle: e.target.value }))}
+                        placeholder="Subtítulo do Post"
+                        style={{ fontSize: '1rem', border: 'none', borderBottom: '1px solid #eee', outline: 'none', width: '250px', color: '#666' }}
+                    />
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     <select
                         value={status}
-                        onChange={e => setStatus(e.target.value as any)}
+                        onChange={e => setStatus(e.target.value as 'draft' | 'published')}
                         style={{ padding: '0.4rem', border: '1px solid #000' }}
                     >
                         <option value="draft">Rascunho 🔒</option>

@@ -5,8 +5,8 @@ export interface ContentBlock {
     type: ContentType;
     content: string; // Markdown text, code string, or image URL
     language?: string; // For code blocks (e.g., 'typescript', 'python')
-    styles?: Record<string, any>; // Custom CSS styles
-    metadata?: Record<string, any>; // Extra data (e.g., image caption)
+    styles?: Record<string, unknown>; // Custom CSS styles
+    metadata?: Record<string, unknown>; // Extra data (e.g., image caption)
 }
 
 // React-Grid-Layout native item structure
@@ -25,6 +25,7 @@ export interface StudyNote {
     id: string;
     slug: string;
     title: string;
+    subtitle?: string;
     description: string;
     imageUrl?: string;
     category: string; // Maps to folder structure

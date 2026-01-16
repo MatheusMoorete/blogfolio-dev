@@ -9,12 +9,6 @@ const StudyNoteViewer: React.FC = () => {
     const [note, setNote] = useState<StudyNote | null>(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        if (id) {
-            fetchPost(id);
-        }
-    }, [id]);
-
     const fetchPost = async (slug: string) => {
         setLoading(true);
         const { data, error } = await supabase
@@ -30,6 +24,7 @@ const StudyNoteViewer: React.FC = () => {
                 id: data.id,
                 slug: data.slug,
                 title: data.title,
+                subtitle: data.subtitle || '',
                 description: data.description || '',
                 category: data.category || 'geral',
                 tags: data.tags || [],
@@ -42,6 +37,14 @@ const StudyNoteViewer: React.FC = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        if (id) {
+            Promise.resolve().then(() => {
+                fetchPost(id);
+            });
+        }
+    }, [id]);
+
     if (loading) return <div style={{ padding: '50px', textAlign: 'center' }}>Carregando post...</div>;
     if (!note) return <div style={{ padding: '50px', textAlign: 'center' }}>Ops! Post não encontrado. <Link to="/blog">Voltar ao Blog</Link></div>;
 
@@ -50,6 +53,7 @@ const StudyNoteViewer: React.FC = () => {
             <div style={{ marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.8rem', paddingLeft: '0', paddingRight: '1rem' }}>
                 <Link to="/blog" style={{ textDecoration: 'none', color: '#666', fontSize: '0.75rem', display: 'block', marginBottom: '0.5rem' }}>← Voltar para o Blog</Link>
                 <h1 className="blog-article-title" style={{ marginBottom: '0.2rem', lineHeight: '1' }}>{note.title}</h1>
+                {note.subtitle && <p className="blog-post-subtitle" style={{ fontSize: '1.1rem', color: '#666', fontStyle: 'italic', marginBottom: '0.5rem' }}>{note.subtitle}</p>}
                 <p style={{ fontSize: '0.9rem', color: '#555', marginBottom: '0.4rem', lineHeight: '1.4' }}>{note.description}</p>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
                     {note.tags.map(tag => (

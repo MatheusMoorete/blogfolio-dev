@@ -3,6 +3,7 @@ import Window from '../components/Window';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../hooks/useTranslation';
 import { supabase } from '../lib/supabase';
+import './Blog.css';
 import type { StudyNote, ContentBlock, GridLayoutItem } from '../types/study-notes';
 
 const BlogPage: React.FC = () => {
@@ -27,6 +28,7 @@ const BlogPage: React.FC = () => {
                     id: string;
                     slug: string;
                     title: string;
+                    subtitle?: string;
                     description?: string;
                     category?: string;
                     tags?: string[];
@@ -43,6 +45,7 @@ const BlogPage: React.FC = () => {
                     id: post.id,
                     slug: post.slug,
                     title: post.title,
+                    subtitle: post.subtitle || '',
                     description: post.description || '',
                     imageUrl: post.content?.image_url || '',
                     category: post.category || 'geral',
@@ -106,6 +109,7 @@ const BlogPage: React.FC = () => {
                                 </div>
                                 <div className="blog-post-content">
                                     <h2 className="blog-post-title" onClick={() => navigate(`/blog/${post.slug}`)}>{post.title}</h2>
+                                    {post.subtitle && <p className="blog-post-subtitle" style={{ fontSize: '0.9rem', color: '#888', fontStyle: 'italic', marginBottom: '0.5rem' }}>{post.subtitle}</p>}
                                     <p className="blog-post-description">
                                         {post.description}
                                     </p>
