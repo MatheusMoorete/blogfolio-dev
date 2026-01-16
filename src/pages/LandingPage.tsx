@@ -19,6 +19,18 @@ const LandingPage: React.FC = () => {
     const { t } = useTranslation();
     const [recentPosts, setRecentPosts] = React.useState<StudyNote[]>([]);
     const [loadingPosts, setLoadingPosts] = React.useState(true);
+    const [doomActive, setDoomActive] = React.useState(false);
+    const [clickCount, setClickCount] = React.useState(0);
+
+    const handleHeroClick = () => {
+        const newCount = clickCount + 1;
+        setClickCount(newCount);
+        if (newCount >= 5) {
+            setDoomActive(true);
+        }
+    };
+
+    const DoomGame = React.lazy(() => import('../components/easter-eggs/DoomGame'));
 
     React.useEffect(() => {
         const fetchRecentPosts = async () => {
@@ -106,13 +118,19 @@ const LandingPage: React.FC = () => {
                     }}>{t('viewProjects')}</button>
                 </div>
                 <div className="hero-image-container">
-                    <Window title="hello.img" className="hero-image">
-                        <div style={{ overflow: 'hidden', display: 'flex' }}>
-                            <img
-                                src={heroImg}
-                                alt="Hero"
-                                className="hero-img"
-                            />
+                    <Window title={doomActive ? "DOOM.EXE" : "hello.img"} className="hero-image" onClick={handleHeroClick}>
+                        <div style={{ overflow: 'hidden', display: 'flex', cursor: doomActive ? 'default' : 'pointer' }}>
+                            {doomActive ? (
+                                <React.Suspense fallback={<div style={{ width: 300, height: 200, background: '#000' }} />}>
+                                    <DoomGame />
+                                </React.Suspense>
+                            ) : (
+                                <img
+                                    src={heroImg}
+                                    alt="Hero"
+                                    className="hero-img"
+                                />
+                            )}
                         </div>
                     </Window>
                 </div>
@@ -294,7 +312,7 @@ const LandingPage: React.FC = () => {
                     </div>
                 </Window>
             </section>
-        </div >
+        </div>
     );
 };
 

@@ -7,7 +7,6 @@ const HackerMode: React.FC = () => {
 
     useKonamiCode(() => {
         setIsActive(prev => !prev);
-        console.log('Hacker Mode toggled:', !isActive);
     });
 
     useEffect(() => {

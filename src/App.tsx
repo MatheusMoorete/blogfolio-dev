@@ -1,16 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import BlogPage from './pages/BlogPage';
-import NoteEditor from './components/study/NoteEditor';
-import StudyNoteViewer from './components/study/StudyNoteViewer';
-import BSOD from './components/easter-eggs/BSOD';
 import Login from './pages/admin/Login';
 import ProtectedRoute from './components/admin/ProtectedRoute';
-import AdminDashboard from './pages/admin/Dashboard';
-import HackerMode from './components/easter-eggs/HackerMode';
 import CRTFilter from './components/effects/CRTFilter';
+
+// Lazy load heavy components
+const NoteEditor = lazy(() => import('./components/study/NoteEditor'));
+const StudyNoteViewer = lazy(() => import('./components/study/StudyNoteViewer'));
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const BSOD = lazy(() => import('./components/easter-eggs/BSOD'));
+const HackerMode = lazy(() => import('./components/easter-eggs/HackerMode'));
+
+const LoadingFallback = () => (
+  <div style={{ padding: '2rem', textAlign: 'center', fontFamily: 'monospace' }}>
+    Carregando...
+  </div>
+);
 
 const App: React.FC = () => {
   const [showBSOD, setShowBSOD] = useState(false);
@@ -29,40 +37,48 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <HackerMode />
+      <Suspense fallback={null}>
+        <HackerMode />
+      </Suspense>
       <CRTFilter enabled={crtEnabled} />
-      {showBSOD && <BSOD onComplete={handleRestart} />}
+      {showBSOD && (
+        <Suspense fallback={<LoadingFallback />}>
+          <BSOD onComplete={handleRestart} />
+        </Suspense>
+      )}
       <Layout>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:id" element={<StudyNoteViewer />} />
-          <Route path="/admin" element={<Login />} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/blog/editor"
-            element={
-              <ProtectedRoute>
-                <NoteEditor />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/blog/editor/:id"
-            element={
-              <ProtectedRoute>
-                <NoteEditor />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:id" element={<StudyNoteViewer />} />
+            <Route path="/admin" element={<Login />} />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/blog/editor"
+              element={
+                <ProtectedRoute>
+                  <NoteEditor />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/blog/editor/:id"
+              element={
+                <ProtectedRoute>
+                  <NoteEditor />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </Suspense>
       </Layout>
       <button
         onClick={() => setCrtEnabled(!crtEnabled)}
@@ -89,3 +105,4 @@ const App: React.FC = () => {
 };
 
 export default App;
+

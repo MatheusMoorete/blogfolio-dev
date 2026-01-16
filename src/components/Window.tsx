@@ -7,11 +7,12 @@ interface WindowProps {
   headerClassName?: string;
   style?: React.CSSProperties;
   contentStyle?: React.CSSProperties;
+  onClick?: () => void;
 }
 
-const Window: React.FC<WindowProps> = ({ title, children, className = '', headerClassName = '', style = {}, contentStyle = {} }) => {
+const Window: React.FC<WindowProps> = ({ title, children, className = '', headerClassName = '', style = {}, contentStyle = {}, onClick }) => {
   return (
-    <div className={`retro-window ${className}`} style={style}>
+    <div className={`retro-window ${className}`} style={style} onClick={onClick}>
       <div className={`retro-window-header ${headerClassName}`}>
         <div className="retro-window-controls">
           <div className="retro-control"></div>

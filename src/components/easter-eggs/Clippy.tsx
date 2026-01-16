@@ -21,7 +21,7 @@ const Clippy: React.FC = () => {
                 isScrollingInProjects = true;
                 // Wait 5 seconds in projects section before showing Clippy
                 timer = setTimeout(() => {
-                    setMessage("Parece que você está procurando um desenvolvedor. Gostaria de ajuda para enviar um e-mail?");
+                    setMessage("Parece que você está procurando um desenvolvedor. Gostaria de ajuda para entrar em contato?");
                     setIsVisible(true);
                 }, 5000);
             } else if (!isInView) {
