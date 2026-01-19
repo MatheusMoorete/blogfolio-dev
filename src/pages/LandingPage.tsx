@@ -9,7 +9,7 @@ import heroImg from '../assets/soueu.webp';
 import syncmanagerImg from '../assets/syncmanager.png';
 import unitaskImg from '../assets/unitask.png';
 import { supabase } from '../lib/supabase';
-import type { StudyNote, ContentBlock, GridLayoutItem } from '../types/study-notes';
+import type { StudyNote } from '../types/study-notes';
 
 import Clippy from '../components/easter-eggs/Clippy';
 
@@ -44,11 +44,8 @@ const LandingPage: React.FC = () => {
                     pin_position: number | null;
                     created_at: string;
                     updated_at: string;
-                    content: {
-                        image_url?: string;
-                        layout?: GridLayoutItem[];
-                        blocks?: Record<string, ContentBlock>;
-                    };
+                    image_url?: string;
+                    content: { html?: string; image_url?: string } | string;
                 }
 
                 const mappedPosts = data.map((post: DatabasePost) => ({
@@ -56,14 +53,13 @@ const LandingPage: React.FC = () => {
                     slug: post.slug,
                     title: post.title,
                     description: post.description || '',
-                    imageUrl: post.content?.image_url || '',
+                    imageUrl: post.image_url || (typeof post.content === 'object' ? post.content?.image_url : '') || '',
                     category: post.category || 'geral',
                     tags: post.tags || [],
                     pinPosition: post.pin_position,
                     createdAt: post.created_at,
                     updatedAt: post.updated_at,
-                    layout: post.content.layout || [],
-                    blocks: post.content.blocks || {},
+                    content: typeof post.content === 'string' ? post.content : (post.content?.html || ''),
                 }));
                 setRecentPosts(mappedPosts);
             }

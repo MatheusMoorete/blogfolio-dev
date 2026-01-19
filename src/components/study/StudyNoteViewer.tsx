@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import GridRenderer from './GridRenderer';
 import { supabase } from '../../lib/supabase';
 import type { StudyNote } from '../../types/study-notes';
+import './TiptapEditor.css';
 
 const StudyNoteViewer: React.FC = () => {
     const { id } = useParams<{ id: string }>(); // This 'id' is actually the slug
@@ -20,6 +20,36 @@ const StudyNoteViewer: React.FC = () => {
         if (error) {
             console.error('Error fetching post:', error);
         } else if (data) {
+            // Handle both new (content as HTML string) and legacy (content.blocks) formats
+            let htmlContent = '';
+            if (typeof data.content === 'string') {
+                htmlContent = data.content;
+            } else if (data.content?.html) {
+                htmlContent = data.content.html;
+            } else if (data.content?.blocks) {
+                // Legacy format - convert blocks to basic HTML
+                const blocks = data.content.blocks as Record<string, { type: string; content: string; language?: string }>;
+                const layout = data.content.layout as Array<{ i: string; y: number; x: number }> || [];
+                const sortedItems = [...layout].sort((a, b) => a.y - b.y || a.x - b.x);
+
+                htmlContent = sortedItems.map(item => {
+                    const block = blocks[item.i];
+                    if (!block) return '';
+
+                    switch (block.type) {
+                        case 'markdown':
+                        case 'text':
+                            return `<p>${block.content}</p>`;
+                        case 'code':
+                            return `<pre><code>${block.content}</code></pre>`;
+                        case 'image':
+                            return `<img src="${block.content}" alt="image" class="tiptap-image" />`;
+                        default:
+                            return `<p>${block.content}</p>`;
+                    }
+                }).join('\n');
+            }
+
             setNote({
                 id: data.id,
                 slug: data.slug,
@@ -31,8 +61,7 @@ const StudyNoteViewer: React.FC = () => {
                 pinPosition: data.pin_position,
                 createdAt: data.created_at,
                 updatedAt: data.updated_at,
-                layout: data.content.layout || [],
-                blocks: data.content.blocks || {},
+                content: htmlContent || '',
             });
         }
         setLoading(false);
@@ -66,8 +95,15 @@ const StudyNoteViewer: React.FC = () => {
                 </div>
             </div>
 
-            <div style={{ background: '#fff', padding: '0', width: '100%', overflow: 'hidden' }}>
-                <GridRenderer note={note} isEditable={false} />
+            {/* Render HTML content from Tiptap */}
+            <div
+                className="tiptap-content"
+                style={{ background: '#fff', padding: '1rem 0', width: '100%' }}
+            >
+                <div
+                    className="tiptap"
+                    dangerouslySetInnerHTML={{ __html: note.content }}
+                />
             </div>
 
             <div style={{
