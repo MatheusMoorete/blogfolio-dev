@@ -1,0 +1,87 @@
+.quick-nav-container {
+    position: sticky;
+    top: 20px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.quick-nav-content {
+    padding: 12px;
+}
+
+.quick-nav-header {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+}
+
+.quick-nav-divider {
+    height: 2px;
+    background: var(--border-color);
+    margin-bottom: 12px;
+}
+
+.quick-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.quick-nav-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 12px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: white;
+    transition: all 0.1s;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.quick-nav-item:hover {
+    background: #f0f0f0;
+    border-color: var(--border-color);
+}
+
+.quick-nav-item.active {
+    background: var(--border-color);
+    color: white;
+    border-color: var(--border-color);
+}
+
+.quick-nav-item.active .quick-nav-number {
+    color: white;
+}
+
+.quick-nav-title {
+    flex: 1;
+    word-break: break-word;
+}
+
+.quick-nav-container::-webkit-scrollbar {
+    width: 12px;
+}
+
+.quick-nav-container::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+    border: 1px solid;
+    border-color: #ffffff #808080 #808080 #ffffff;
+}
+
+.quick-nav-container::-webkit-scrollbar-track {
+    background-color: #dfdfdf;
+}
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+    .quick-nav-container {
+        display: none;
+    }
+}
