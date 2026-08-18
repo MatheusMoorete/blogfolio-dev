@@ -1,21 +1,31 @@
 .tiptap-container {
     border: 2px solid #000;
     background: #fff;
+    position: relative;
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.15);
 }
 
-/* GitHub-style tabs */
+.tiptap-loading {
+    padding: 2rem;
+    text-align: center;
+    font-family: var(--font-mono), monospace;
+    color: #666;
+}
+
+/* GitHub / Retro style tabs */
 .tiptap-tabs {
     display: flex;
-    gap: 0;
+    align-items: center;
     border-bottom: 2px solid #000;
-    background: #f5f5f5;
+    background: #f0f0f0;
+    padding-right: 0.75rem;
 }
 
 .tiptap-tab {
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.6rem 1rem;
+    padding: 0.6rem 1.1rem;
     background: transparent;
     border: none;
     border-right: 1px solid #ccc;
@@ -23,8 +33,8 @@
     font-family: var(--font-mono), monospace;
     font-size: 0.85rem;
     font-weight: 500;
-    color: #666;
-    transition: all 0.15s;
+    color: #555;
+    transition: all 0.15s ease;
 }
 
 .tiptap-tab:hover {
@@ -40,28 +50,33 @@
     font-weight: bold;
 }
 
-.tiptap-hint {
+.tiptap-stats {
     margin-left: auto;
-    padding: 0.6rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
     font-size: 0.75rem;
-    color: #888;
+    color: #666;
     font-family: var(--font-mono), monospace;
 }
 
+/* Toolbar */
 .tiptap-toolbar {
     display: flex;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    gap: 0.4rem;
+    padding: 0.4rem 0.6rem;
     border-bottom: 2px solid #000;
-    background: #f5f5f5;
+    background: #fafafa;
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .toolbar-group {
     display: flex;
+    align-items: center;
     gap: 2px;
-    padding-right: 0.5rem;
-    border-right: 1px solid #ccc;
+    padding-right: 0.4rem;
+    border-right: 1px solid #ddd;
 }
 
 .toolbar-group:last-child {
@@ -70,266 +85,585 @@
 
 .tiptap-toolbar button {
     background: #fff;
-    border: 1px solid #000;
-    padding: 0.4rem;
+    border: 1px solid #ccc;
+    padding: 0.35rem 0.45rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s;
+    transition: all 0.12s ease;
+    border-radius: 2px;
+    color: #222;
+    min-width: 28px;
+    height: 28px;
 }
 
 .tiptap-toolbar button:hover {
-    background: #e0e0e0;
+    background: #e5e5e5;
+    border-color: #999;
 }
 
 .tiptap-toolbar button.is-active {
     background: #000;
     color: #fff;
+    border-color: #000;
 }
 
 .tiptap-toolbar button:disabled {
-    opacity: 0.4;
+    opacity: 0.35;
     cursor: not-allowed;
 }
 
-.tiptap-content {
-    min-height: 400px;
-    padding: 1rem;
+/* Dropdown Menu */
+.dropdown-wrapper {
+    position: relative;
+    display: inline-block;
 }
 
-.tiptap-content .tiptap {
+.tiptap-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    background: #fff;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0px #000;
+    padding: 0.3rem 0;
+    z-index: 100;
+    min-width: 180px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.tiptap-dropdown-menu button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 0.75rem;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-family: var(--font-mono), monospace;
+    color: #111;
+    min-width: auto;
+    height: auto;
+    justify-content: flex-start;
+}
+
+.tiptap-dropdown-menu button:hover {
+    background: #f0f0f0;
+}
+
+/* Bubble Menu (Floating on Text Selection) */
+.tiptap-bubble-menu {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0px #000;
+    padding: 2px;
+    gap: 2px;
+    border-radius: 3px;
+    z-index: 1000;
+}
+
+.tiptap-bubble-menu button {
+    background: #fff;
+    border: 1px solid transparent;
+    padding: 0.25rem 0.35rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #222;
+    min-width: 24px;
+    height: 24px;
+    border-radius: 2px;
+    transition: all 0.1s ease;
+}
+
+.tiptap-bubble-menu button:hover {
+    background: #e8e8e8;
+    border-color: #ccc;
+}
+
+.tiptap-bubble-menu button.is-active {
+    background: #000;
+    color: #fff;
+}
+
+/* Content Area */
+.tiptap-content {
+    min-height: 450px;
+    padding: 1.5rem;
+    cursor: text;
+}
+
+.tiptap-content .tiptap,
+.tiptap-preview .tiptap {
     outline: none;
-    min-height: 380px;
+    min-height: 420px;
     font-family: var(--font-mono), monospace;
     font-size: 0.95rem;
-    line-height: 1.6;
+    line-height: 1.7;
+    color: #222;
 }
 
-.tiptap-content .tiptap>*:first-child {
+.tiptap-content .tiptap > *:first-child,
+.tiptap-preview .tiptap > *:first-child {
     margin-top: 0;
 }
 
 /* Typography */
-.tiptap-content .tiptap h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin: 1.5rem 0 0.75rem;
+.tiptap h1 {
+    font-size: 1.85rem;
+    font-weight: 800;
+    margin: 1.8rem 0 0.8rem;
     border-bottom: 2px solid #000;
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.4rem;
+    line-height: 1.3;
 }
 
-.tiptap-content .tiptap h2 {
-    font-size: 1.4rem;
-    font-weight: bold;
-    margin: 1.25rem 0 0.5rem;
+.tiptap h2 {
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.6rem;
+    line-height: 1.35;
 }
 
-.tiptap-content .tiptap h3 {
+.tiptap h3 {
     font-size: 1.2rem;
-    font-weight: bold;
-    margin: 1rem 0 0.5rem;
+    font-weight: 700;
+    margin: 1.2rem 0 0.5rem;
+    line-height: 1.4;
 }
 
-.tiptap-content .tiptap p {
-    margin: 0.75rem 0;
+.tiptap p {
+    margin: 0.8rem 0;
 }
 
-.tiptap-content .tiptap strong {
-    font-weight: bold;
+.tiptap strong {
+    font-weight: 700;
+    color: #000;
 }
 
-.tiptap-content .tiptap em {
+.tiptap em {
     font-style: italic;
 }
 
-/* Lists */
-.tiptap-content .tiptap ul,
-.tiptap-content .tiptap ol {
-    padding-left: 1.5rem;
-    margin: 0.75rem 0;
+.tiptap u {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
-.tiptap-content .tiptap li {
-    margin: 0.25rem 0;
+.tiptap s {
+    text-decoration: line-through;
+    opacity: 0.8;
+}
+
+/* Links */
+.tiptap a,
+.tiptap .tiptap-link {
+    color: #0056b3;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.tiptap a:hover {
+    color: #003366;
+    background-color: rgba(0, 86, 179, 0.08);
+}
+
+/* Inline Highlight / Marca-texto */
+.tiptap mark,
+.tiptap .tiptap-highlight {
+    background-color: #fef08a;
+    color: #000;
+    padding: 0.1em 0.3em;
+    border-radius: 2px;
+}
+
+/* Inline Quote (<q class="inline-quote">) */
+.tiptap q.inline-quote {
+    quotes: "“" "”" "‘" "’";
+    background-color: #f3f4f6;
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    font-style: italic;
+    color: #1f2937;
+    border-left: 2px solid #6b7280;
 }
 
 /* Blockquote */
-.tiptap-content .tiptap blockquote {
+.tiptap blockquote {
     border-left: 4px solid #000;
-    padding-left: 1rem;
-    margin: 1rem 0;
+    background: #f8f9fa;
+    padding: 0.8rem 1.2rem;
+    margin: 1.2rem 0;
     font-style: italic;
-    background: #f9f9f9;
-    padding: 0.75rem 1rem;
+    color: #333;
 }
 
-/* Code */
-.tiptap-content .tiptap code {
-    background: #f0f0f0;
-    padding: 0.1rem 0.3rem;
+.tiptap blockquote p {
+    margin: 0.4rem 0;
+}
+
+/* Retro Callouts / Admonitions */
+.tiptap .retro-callout {
+    border: 2px solid #000;
+    padding: 1rem 1.2rem;
+    margin: 1.2rem 0;
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
+    position: relative;
     border-radius: 2px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
 }
 
-.tiptap-content .tiptap pre {
-    background: #1a1a1a;
-    color: #f0f0f0;
-    padding: 1rem;
+.tiptap .retro-callout-tip {
+    background: #fefce8;
+    border-left: 6px solid #ca8a04;
+}
+
+.tiptap .retro-callout-info {
+    background: #eff6ff;
+    border-left: 6px solid #2563eb;
+}
+
+.tiptap .retro-callout-warning {
+    background: #fef2f2;
+    border-left: 6px solid #dc2626;
+}
+
+.tiptap .retro-callout-quote {
+    background: #faf5ff;
+    border-left: 6px solid #7c3aed;
+}
+
+.tiptap .retro-callout > *:first-child {
+    margin-top: 0;
+}
+
+.tiptap .retro-callout > *:last-child {
+    margin-bottom: 0;
+}
+
+/* Lists */
+.tiptap ul,
+.tiptap ol {
+    padding-left: 1.6rem;
+    margin: 0.8rem 0;
+}
+
+.tiptap li {
+    margin: 0.3rem 0;
+}
+
+/* Task Lists (Checklists) */
+.tiptap ul[data-type="taskList"],
+.tiptap .tiptap-task-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 0.8rem 0;
+}
+
+.tiptap ul[data-type="taskList"] li,
+.tiptap .tiptap-task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin: 0.4rem 0;
+}
+
+.tiptap ul[data-type="taskList"] li > label,
+.tiptap .tiptap-task-item > label {
+    margin-top: 0.2rem;
+    user-select: none;
+    cursor: pointer;
+}
+
+.tiptap ul[data-type="taskList"] li > label input[type="checkbox"],
+.tiptap .tiptap-task-item > label input[type="checkbox"] {
+    cursor: pointer;
+    accent-color: #000;
+    width: 15px;
+    height: 15px;
+}
+
+.tiptap ul[data-type="taskList"] li > div,
+.tiptap .tiptap-task-item > div {
+    flex: 1;
+}
+
+.tiptap ul[data-type="taskList"] li[data-checked="true"] > div {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* Code & Syntax Highlighting */
+.tiptap code {
+    background: #eef2f6;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+    color: #d63384;
+    border: 1px solid #e2e8f0;
+}
+
+.tiptap pre {
+    background: #18181b;
+    color: #f4f4f5;
+    padding: 1.1rem;
     border-radius: 4px;
     overflow-x: auto;
-    margin: 1rem 0;
-    border: 1px solid #333;
+    margin: 1.2rem 0;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15);
 }
 
-.tiptap-content .tiptap pre code {
+.tiptap pre code {
     background: none;
     padding: 0;
     color: inherit;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
+    border: none;
 }
 
-/* Syntax highlighting */
-.tiptap-content .tiptap pre .hljs-keyword,
-.tiptap-content .tiptap pre .hljs-selector-tag {
+/* Highlight.js syntax highlighting colors */
+.tiptap pre .hljs-keyword,
+.tiptap pre .hljs-selector-tag,
+.tiptap pre .hljs-built_in {
     color: #c678dd;
+    font-weight: bold;
 }
 
-.tiptap-content .tiptap pre .hljs-string,
-.tiptap-content .tiptap pre .hljs-attr {
+.tiptap pre .hljs-string,
+.tiptap pre .hljs-attr {
     color: #98c379;
 }
 
-.tiptap-content .tiptap pre .hljs-number {
+.tiptap pre .hljs-number,
+.tiptap pre .hljs-literal {
     color: #d19a66;
 }
 
-.tiptap-content .tiptap pre .hljs-comment {
+.tiptap pre .hljs-comment {
     color: #5c6370;
     font-style: italic;
 }
 
-.tiptap-content .tiptap pre .hljs-function {
+.tiptap pre .hljs-function,
+.tiptap pre .hljs-title {
     color: #61afef;
 }
 
-.tiptap-content .tiptap pre .hljs-variable,
-.tiptap-content .tiptap pre .hljs-title {
+.tiptap pre .hljs-variable,
+.tiptap pre .hljs-params {
     color: #e06c75;
 }
 
+.tiptap pre .hljs-type,
+.tiptap pre .hljs-class {
+    color: #e5c07b;
+}
+
+/* Tables */
+.tiptap table,
+.tiptap .tiptap-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.2rem 0;
+    table-layout: fixed;
+    border: 2px solid #000;
+}
+
+.tiptap th,
+.tiptap td {
+    border: 1px solid #ccc;
+    padding: 0.6rem 0.8rem;
+    vertical-align: top;
+    box-sizing: border-box;
+    position: relative;
+    min-width: 80px;
+}
+
+.tiptap th {
+    background: #f0f0f0;
+    font-weight: bold;
+    text-align: left;
+    border-bottom: 2px solid #000;
+}
+
+.tiptap .selectedCell:after {
+    z-index: 2;
+    position: absolute;
+    content: "";
+    left: 0; right: 0; top: 0; bottom: 0;
+    background: rgba(200, 200, 255, 0.4);
+    pointer-events: none;
+}
+
+/* Divider / Horizontal Rule */
+.tiptap hr {
+    border: none;
+    border-top: 2px dashed #000;
+    margin: 1.8rem 0;
+}
+
 /* Images */
-.tiptap-content .tiptap .tiptap-image {
+.tiptap img,
+.tiptap .tiptap-image {
     max-width: 100%;
     height: auto;
-    margin: 1rem 0;
-    border: 1px solid #ccc;
+    margin: 1.2rem 0;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.1);
+    display: block;
 }
 
 /* Placeholder */
-.tiptap-content .tiptap p.is-editor-empty:first-child::before {
-    content: 'Comece a escrever...';
-    color: #aaa;
+.tiptap p.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    color: #9ca3af;
     float: left;
     height: 0;
     pointer-events: none;
 }
 
-/* Preview pane */
+/* Preview Tab */
 .tiptap-preview {
-    min-height: 400px;
-    padding: 1rem;
-    background: #fafafa;
-    border-top: 1px dashed #ccc;
+    min-height: 450px;
+    padding: 1.5rem;
+    background: #fff;
 }
 
-.tiptap-preview .tiptap {
-    font-family: var(--font-mono), monospace;
-    font-size: 0.95rem;
-    line-height: 1.6;
+/* Modals */
+.tiptap-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
 }
 
-/* Apply same typography to preview */
-.tiptap-preview .tiptap h1 {
-    font-size: 1.8rem;
-    font-weight: bold;
-    margin: 1.5rem 0 0.75rem;
+.tiptap-modal {
+    background: #fff;
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0px #000;
+    width: 90%;
+    max-width: 440px;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.tiptap-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     border-bottom: 2px solid #000;
-    padding-bottom: 0.3rem;
+    padding-bottom: 0.5rem;
 }
 
-.tiptap-preview .tiptap h2 {
-    font-size: 1.4rem;
-    font-weight: bold;
-    margin: 1.25rem 0 0.5rem;
+.tiptap-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-family: var(--font-mono), monospace;
 }
 
-.tiptap-preview .tiptap h3 {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 1rem 0 0.5rem;
+.tiptap-modal-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
 }
 
-.tiptap-preview .tiptap p {
-    margin: 0.75rem 0;
+.tiptap-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
 }
 
-.tiptap-preview .tiptap strong {
-    font-weight: bold;
+.tiptap-modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
 }
 
-.tiptap-preview .tiptap em {
-    font-style: italic;
+.tiptap-modal-field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: var(--font-mono), monospace;
 }
 
-.tiptap-preview .tiptap ul,
-.tiptap-preview .tiptap ol {
-    padding-left: 1.5rem;
-    margin: 0.75rem 0;
+.tiptap-modal-field input {
+    padding: 0.5rem;
+    border: 2px solid #000;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.85rem;
+    outline: none;
 }
 
-.tiptap-preview .tiptap li {
-    margin: 0.25rem 0;
+.tiptap-modal-field input:focus {
+    background: #fffbe6;
 }
 
-.tiptap-preview .tiptap blockquote {
-    border-left: 4px solid #000;
-    padding-left: 1rem;
-    margin: 1rem 0;
-    font-style: italic;
-    background: #f9f9f9;
-    padding: 0.75rem 1rem;
+.tiptap-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
 }
 
-.tiptap-preview .tiptap code {
+.tiptap-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid #000;
+    transition: all 0.1s ease;
+}
+
+.tiptap-btn-primary {
+    background: #000;
+    color: #fff;
+}
+
+.tiptap-btn-primary:hover {
+    background: #333;
+}
+
+.tiptap-btn-secondary {
     background: #f0f0f0;
-    padding: 0.1rem 0.3rem;
-    border-radius: 2px;
-    font-family: 'Courier New', monospace;
-    font-size: 0.9em;
+    color: #000;
 }
 
-.tiptap-preview .tiptap pre {
-    background: #1a1a1a;
-    color: #f0f0f0;
-    padding: 1rem;
-    border-radius: 4px;
-    overflow-x: auto;
-    margin: 1rem 0;
-    border: 1px solid #333;
+.tiptap-btn-secondary:hover {
+    background: #e0e0e0;
 }
 
-.tiptap-preview .tiptap pre code {
-    background: none;
-    padding: 0;
-    color: inherit;
-    font-size: 0.9rem;
+.tiptap-btn-danger {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #dc2626;
+    margin-right: auto;
 }
 
-.tiptap-preview .tiptap img {
-    max-width: 100%;
-    height: auto;
-    margin: 1rem 0;
-    border: 1px solid #ccc;
+.tiptap-btn-danger:hover {
+    background: #fecaca;
 }
