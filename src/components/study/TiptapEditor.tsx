@@ -17,12 +17,10 @@ import { TableCell } from '@tiptap/extension-table-cell';
 import Image from '@tiptap/extension-image';
 import { Markdown } from 'tiptap-markdown';
 import { common, createLowlight } from 'lowlight';
-import { marked } from 'marked';
-import { DOMParser as ProseMirrorDOMParser } from 'prosemirror-model';
-
 import { Callout, type CalloutType } from './extensions/Callout';
 import { InlineQuote } from './extensions/InlineQuote';
 import { renderMermaidDiagrams } from '../../lib/renderMermaid';
+import { markdownToHtml, htmlToMarkdown } from '../../lib/markdown';
 
 import {
     Bold,
@@ -70,12 +68,6 @@ import {
 import './TiptapEditor.css';
 
 const lowlight = createLowlight(common);
-
-// Configure marked options
-marked.setOptions({
-    gfm: true,
-    breaks: true,
-});
 
 interface TiptapEditorProps {
     content: string;
@@ -184,7 +176,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         content,
         editable,
         editorProps: {
-            handlePaste: (view, event) => {
+            handlePaste: (_view, event) => {
                 const text = event.clipboardData?.getData('text/plain');
                 if (!text) return false;
 
@@ -195,12 +187,9 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
                 if (hasMarkdown) {
                     try {
-                        const parsedHtml = marked.parse(text) as string;
+                        const parsedHtml = markdownToHtml(text);
                         if (parsedHtml) {
-                            const domParser = new window.DOMParser();
-                            const doc = domParser.parseFromString(parsedHtml, 'text/html');
-                            const slice = ProseMirrorDOMParser.fromSchema(view.state.schema).parseSlice(doc.body);
-                            view.dispatch(view.state.tr.replaceSelection(slice));
+                            editor.commands.insertContent(parsedHtml);
                             return true;
                         }
                     } catch (err) {
@@ -229,18 +218,13 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
     // Update markdownText state when switching tabs
     const handleSwitchTab = (tab: 'write' | 'markdown' | 'preview') => {
         if (tab === 'markdown' && editor) {
-            // Get serialized markdown from tiptap-markdown storage
-            try {
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const md = (editor.storage as any).markdown?.getMarkdown();
-                setMarkdownText(md || editor.getHTML());
-            } catch {
-                setMarkdownText(editor.getHTML());
-            }
+            // Convert current editor HTML to clean Markdown with turndown
+            const md = htmlToMarkdown(editor.getHTML());
+            setMarkdownText(md);
         } else if (activeTab === 'markdown' && tab !== 'markdown' && editor) {
             // When leaving markdown tab, sync back to editor
             try {
-                const parsedHtml = marked.parse(markdownText) as string;
+                const parsedHtml = markdownToHtml(markdownText);
                 editor.commands.setContent(parsedHtml || '<p></p>', { emitUpdate: true });
             } catch (err) {
                 console.error('Erro ao sincronizar markdown:', err);
@@ -335,7 +319,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             const fileContent = e.target?.result as string;
             if (fileContent) {
                 try {
-                    const parsedHtml = marked.parse(fileContent) as string;
+                    const parsedHtml = markdownToHtml(fileContent);
                     editor.commands.setContent(parsedHtml, { emitUpdate: true });
                     setMarkdownText(fileContent);
                 } catch (err) {
@@ -350,8 +334,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
     // Export .md file
     const handleExportMarkdown = () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const md = (editor.storage as any).markdown?.getMarkdown() || markdownText || editor.getText();
+        const md = activeTab === 'markdown' ? markdownText : htmlToMarkdown(editor.getHTML());
         const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -842,9 +825,10 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                         className="tiptap-markdown-editor"
                         value={markdownText}
                         onChange={(e) => {
-                            setMarkdownText(e.target.value);
+                            const val = e.target.value;
+                            setMarkdownText(val);
                             try {
-                                const parsed = marked.parse(e.target.value) as string;
+                                const parsed = markdownToHtml(val);
                                 onChange(parsed);
                             } catch {
                                 // Ignore typing errors
