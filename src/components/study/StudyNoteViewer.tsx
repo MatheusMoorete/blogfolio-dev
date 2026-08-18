@@ -94,10 +94,15 @@ const StudyNoteViewer: React.FC = () => {
     }, [id, fetchPost]);
 
     useEffect(() => {
-        if (note?.content && contentRef.current) {
-            renderMermaidDiagrams(contentRef.current);
+        if (!loading && note?.content && contentRef.current) {
+            const timeout = setTimeout(() => {
+                if (contentRef.current) {
+                    renderMermaidDiagrams(contentRef.current);
+                }
+            }, 60);
+            return () => clearTimeout(timeout);
         }
-    }, [note?.content]);
+    }, [loading, note?.content]);
 
     if (loading) return <div style={{ padding: '50px', textAlign: 'center' }}>Carregando post...</div>;
     if (!note) return <div style={{ padding: '50px', textAlign: 'center' }}>Ops! Post não encontrado. <Link to="/blog">Voltar ao Blog</Link></div>;

@@ -21,6 +21,7 @@ mermaid.initialize({
         nodeTextColor: '#000000',
     },
     securityLevel: 'loose',
+    suppressErrorRendering: false,
 });
 
 let idCounter = 0;
@@ -28,36 +29,38 @@ let idCounter = 0;
 export async function renderMermaidDiagrams(container: HTMLElement | null) {
     if (!container) return;
 
-    // Find code elements that might contain Mermaid definitions
-    const codeBlocks = container.querySelectorAll('pre code, pre');
+    // Target ONLY <pre> elements to avoid duplicate matches with <pre> and <code>
+    const preElements = Array.from(container.querySelectorAll('pre'));
 
-    for (const block of Array.from(codeBlocks)) {
-        const text = block.textContent?.trim() || '';
-        if (!text) continue;
+    for (const preElement of preElements) {
+        if (preElement.getAttribute('data-mermaid-processed') === 'true') continue;
+
+        const codeElement = preElement.querySelector('code') || preElement;
+        const rawText = codeElement.textContent?.trim() || '';
+        if (!rawText) continue;
 
         const isMermaidClass =
-            block.classList.contains('language-mermaid') ||
-            (block.parentElement && block.parentElement.tagName === 'PRE' && block.parentElement.classList.contains('language-mermaid'));
+            preElement.classList.contains('language-mermaid') ||
+            codeElement.classList.contains('language-mermaid');
 
         const isMermaidSyntax =
-            /^(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|gitGraph|mindmap|timeline)\b/m.test(text);
+            /^(flowchart|graph|sequenceDiagram|classDiagram|stateDiagram|erDiagram|gantt|pie|gitGraph|mindmap|timeline)\b/m.test(
+                rawText
+            );
 
         if (isMermaidClass || isMermaidSyntax) {
-            const preElement = block.tagName === 'PRE' ? (block as HTMLElement) : (block.closest('pre') as HTMLElement);
-            if (!preElement || preElement.getAttribute('data-mermaid-processed') === 'true') continue;
+            preElement.setAttribute('data-mermaid-processed', 'true');
+            const id = `mermaid_${Date.now()}_${++idCounter}`;
 
-            const id = `mermaid-svg-${Date.now()}-${++idCounter}`;
             try {
-                // Ensure temporary render elements are cleaned up
-                const { svg } = await mermaid.render(id, text);
+                const { svg } = await mermaid.render(id, rawText);
                 const wrapper = document.createElement('div');
                 wrapper.className = 'mermaid-diagram-wrapper';
                 wrapper.innerHTML = svg;
-                wrapper.setAttribute('data-mermaid-processed', 'true');
                 preElement.replaceWith(wrapper);
             } catch (err) {
-                console.error('Erro ao renderizar diagrama Mermaid:', err);
-                preElement.setAttribute('data-mermaid-processed', 'true');
+                console.error('Erro ao renderizar diagrama Mermaid:', err, '\nCódigo:', rawText);
+                // Keep the preElement if render fails
             }
         }
     }
