@@ -22,6 +22,7 @@ import { DOMParser as ProseMirrorDOMParser } from 'prosemirror-model';
 
 import { Callout, type CalloutType } from './extensions/Callout';
 import { InlineQuote } from './extensions/InlineQuote';
+import { renderMermaidDiagrams } from '../../lib/renderMermaid';
 
 import {
     Bold,
@@ -110,6 +111,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
     const fileInputRef = useRef<HTMLInputElement>(null);
     const calloutRef = useRef<HTMLDivElement>(null);
     const tableRef = useRef<HTMLDivElement>(null);
+    const previewRef = useRef<HTMLDivElement>(null);
 
     const editor = useEditor({
         extensions: [
@@ -246,6 +248,13 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         }
         setActiveTab(tab);
     };
+
+    // Render Mermaid diagrams in preview tab
+    useEffect(() => {
+        if (activeTab === 'preview' && previewRef.current) {
+            renderMermaidDiagrams(previewRef.current);
+        }
+    }, [activeTab, content, editor]);
 
     // Close dropdowns on outside click
     useEffect(() => {
@@ -848,6 +857,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             ) : (
                 <div className="tiptap-preview">
                     <div
+                        ref={previewRef}
                         className="tiptap"
                         dangerouslySetInnerHTML={{ __html: editor.getHTML() }}
                     />

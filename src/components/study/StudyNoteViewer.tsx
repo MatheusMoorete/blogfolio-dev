@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import QuickNavigation from '../QuickNavigation';
 import type { StudyNote } from '../../types/study-notes';
+import { renderMermaidDiagrams } from '../../lib/renderMermaid';
 import './TiptapEditor.css';
 import './StudyNoteViewer.css';
 
@@ -91,6 +92,12 @@ const StudyNoteViewer: React.FC = () => {
             });
         }
     }, [id, fetchPost]);
+
+    useEffect(() => {
+        if (note?.content && contentRef.current) {
+            renderMermaidDiagrams(contentRef.current);
+        }
+    }, [note?.content]);
 
     if (loading) return <div style={{ padding: '50px', textAlign: 'center' }}>Carregando post...</div>;
     if (!note) return <div style={{ padding: '50px', textAlign: 'center' }}>Ops! Post não encontrado. <Link to="/blog">Voltar ao Blog</Link></div>;
