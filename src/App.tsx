@@ -6,6 +6,7 @@ import BlogPage from './pages/BlogPage';
 import Login from './pages/admin/Login';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import CRTFilter from './components/effects/CRTFilter';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy load heavy components
 const NoteEditor = lazy(() => import('./components/study/NoteEditor'));
@@ -47,38 +48,40 @@ const App: React.FC = () => {
         </Suspense>
       )}
       <Layout>
-        <Suspense fallback={<LoadingFallback />}>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/blog" element={<BlogPage />} />
-            <Route path="/blog/:id" element={<StudyNoteViewer />} />
-            <Route path="/admin" element={<Login />} />
-            <Route
-              path="/admin/dashboard"
-              element={
-                <ProtectedRoute>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/blog/editor"
-              element={
-                <ProtectedRoute>
-                  <NoteEditor />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/blog/editor/:id"
-              element={
-                <ProtectedRoute>
-                  <NoteEditor />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Suspense>
+        <ErrorBoundary fallbackTitle="C:\WINDOWS\system32\app_error.exe">
+          <Suspense fallback={<LoadingFallback />}>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/blog" element={<BlogPage />} />
+              <Route path="/blog/:id" element={<StudyNoteViewer />} />
+              <Route path="/admin" element={<Login />} />
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/blog/editor"
+                element={
+                  <ProtectedRoute>
+                    <NoteEditor />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/blog/editor/:id"
+                element={
+                  <ProtectedRoute>
+                    <NoteEditor />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </Layout>
       <button
         onClick={() => setCrtEnabled(!crtEnabled)}
