@@ -27,73 +27,77 @@ const NoteEditor: React.FC = () => {
     });
     const [status, setStatus] = useState<'draft' | 'published'>('draft');
 
-    const fetchPost = async (postId: string) => {
-        setLoading(true);
-        const { data, error } = await supabase
-            .from('posts')
-            .select('*')
-            .eq('id', postId)
-            .single();
-
-        if (error) {
-            console.error('Error fetching post:', error);
-            alert('Erro ao carregar post');
-        } else if (data) {
-            // Handle both new (content as HTML string) and legacy (content.blocks) formats
-            let htmlContent = '';
-            if (typeof data.content === 'string') {
-                htmlContent = data.content;
-            } else if (data.content?.html) {
-                htmlContent = data.content.html;
-            } else if (data.content?.blocks) {
-                // Legacy format - convert blocks to basic HTML
-                const blocks = data.content.blocks as Record<string, { type: string; content: string; language?: string }>;
-                const layout = data.content.layout as Array<{ i: string; y: number; x: number }> || [];
-                const sortedItems = [...layout].sort((a, b) => a.y - b.y || a.x - b.x);
-
-                htmlContent = sortedItems.map(item => {
-                    const block = blocks[item.i];
-                    if (!block) return '';
-
-                    switch (block.type) {
-                        case 'markdown':
-                        case 'text':
-                            return `<p>${block.content}</p>`;
-                        case 'code':
-                            return `<pre><code>${block.content}</code></pre>`;
-                        case 'image':
-                            return `<img src="${block.content}" alt="image" />`;
-                        default:
-                            return `<p>${block.content}</p>`;
-                    }
-                }).join('\n');
-            }
-
-            setNote({
-                id: data.id,
-                slug: data.slug,
-                title: data.title,
-                subtitle: data.subtitle || '',
-                description: data.description || '',
-                category: data.category || 'geral',
-                tags: data.tags || [],
-                pinPosition: data.pin_position,
-                createdAt: data.created_at,
-                updatedAt: data.updated_at,
-                content: htmlContent || '<p></p>',
-                imageUrl: data.image_url || '',
-            });
-            setStatus(data.status as 'draft' | 'published');
-        }
-        setLoading(false);
-    };
-
     useEffect(() => {
-        Promise.resolve().then(() => {
-            if (id && id !== 'new-note') {
-                fetchPost(id);
+        let isMounted = true;
+
+        const loadPost = async (postId: string) => {
+            setLoading(true);
+            const { data, error } = await supabase
+                .from('posts')
+                .select('*')
+                .eq('id', postId)
+                .single();
+
+            if (!isMounted) return;
+
+            if (error) {
+                console.error('Error fetching post:', error);
+                alert('Erro ao carregar post');
+            } else if (data) {
+                let htmlContent = '';
+                if (typeof data.content === 'string') {
+                    htmlContent = data.content;
+                } else if (data.content?.html) {
+                    htmlContent = data.content.html;
+                } else if (data.content?.blocks) {
+                    const blocks = data.content.blocks as Record<string, { type: string; content: string; language?: string }>;
+                    const layout = data.content.layout as Array<{ i: string; y: number; x: number }> || [];
+                    const sortedItems = [...layout].sort((a, b) => a.y - b.y || a.x - b.x);
+
+                    htmlContent = sortedItems.map(item => {
+                        const block = blocks[item.i];
+                        if (!block) return '';
+
+                        switch (block.type) {
+                            case 'markdown':
+                            case 'text':
+                                return `<p>${block.content}</p>`;
+                            case 'code':
+                                return `<pre><code>${block.content}</code></pre>`;
+                            case 'image':
+                                return `<img src="${block.content}" alt="image" />`;
+                            default:
+                                return `<p>${block.content}</p>`;
+                        }
+                    }).join('\n');
+                }
+
+                setNote({
+                    id: data.id,
+                    slug: data.slug,
+                    title: data.title,
+                    subtitle: data.subtitle || '',
+                    description: data.description || '',
+                    category: data.category || 'geral',
+                    tags: data.tags || [],
+                    pinPosition: data.pin_position,
+                    createdAt: data.created_at,
+                    updatedAt: data.updated_at,
+                    content: htmlContent || '<p></p>',
+                    imageUrl: data.image_url || '',
+                });
+                setStatus(data.status as 'draft' | 'published');
             }
-        });
+            setLoading(false);
+        };
+
+        if (id && id !== 'new-note') {
+            loadPost(id);
+        }
+
+        return () => {
+            isMounted = false;
+        };
     }, [id]);
 
     const handleSave = async () => {

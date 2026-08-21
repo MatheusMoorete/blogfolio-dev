@@ -15,7 +15,6 @@ import { TableRow } from '@tiptap/extension-table-row';
 import { TableHeader } from '@tiptap/extension-table-header';
 import { TableCell } from '@tiptap/extension-table-cell';
 import Image from '@tiptap/extension-image';
-import { Markdown } from 'tiptap-markdown';
 import { common, createLowlight } from 'lowlight';
 import { Callout, type CalloutType } from './extensions/Callout';
 import { InlineQuote } from './extensions/InlineQuote';
@@ -165,11 +164,6 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                 },
                 allowBase64: true,
             }),
-            Markdown.configure({
-                html: true,
-                transformPastedText: true,
-                transformCopiedText: true,
-            }),
             Callout,
             InlineQuote,
         ],
@@ -188,7 +182,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                 if (hasMarkdown) {
                     try {
                         const parsedHtml = markdownToHtml(text);
-                        if (parsedHtml) {
+                        if (parsedHtml && editor && !editor.isDestroyed) {
                             editor.commands.insertContent(parsedHtml);
                             return true;
                         }
@@ -200,14 +194,16 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             },
         },
         onUpdate: ({ editor }) => {
-            const html = editor.getHTML();
-            onChange(html);
+            if (editor && !editor.isDestroyed) {
+                const html = editor.getHTML();
+                onChange(html);
+            }
         },
     });
 
     // Synchronize content if modified externally (e.g. async Supabase fetch)
     useEffect(() => {
-        if (editor && content !== undefined) {
+        if (editor && !editor.isDestroyed && content !== undefined) {
             const currentHTML = editor.getHTML();
             if (content !== currentHTML && !editor.isFocused) {
                 editor.commands.setContent(content || '', { emitUpdate: false });
@@ -217,11 +213,11 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
     // Update markdownText state when switching tabs
     const handleSwitchTab = (tab: 'write' | 'markdown' | 'preview') => {
-        if (tab === 'markdown' && editor) {
+        if (tab === 'markdown' && editor && !editor.isDestroyed) {
             // Convert current editor HTML to clean Markdown with turndown
             const md = htmlToMarkdown(editor.getHTML());
             setMarkdownText(md);
-        } else if (activeTab === 'markdown' && tab !== 'markdown' && editor) {
+        } else if (activeTab === 'markdown' && tab !== 'markdown' && editor && !editor.isDestroyed) {
             // When leaving markdown tab, sync back to editor
             try {
                 const parsedHtml = markdownToHtml(markdownText);
@@ -254,7 +250,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    if (!editor) {
+    if (!editor || editor.isDestroyed) {
         return <div className="tiptap-loading">Carregando editor...</div>;
     }
 
@@ -334,7 +330,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
     // Export .md file
     const handleExportMarkdown = () => {
-        const md = activeTab === 'markdown' ? markdownText : htmlToMarkdown(editor.getHTML());
+        const md = activeTab === 'markdown' ? markdownText : (editor && !editor.isDestroyed ? htmlToMarkdown(editor.getHTML()) : '');
         const blob = new Blob([md], { type: 'text/markdown;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -345,12 +341,12 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
     };
 
     // Calculate word & character metrics
-    const textContent = activeTab === 'markdown' ? markdownText : editor.getText();
+    const textContent = activeTab === 'markdown' ? markdownText : (editor && !editor.isDestroyed ? editor.getText() : '');
     const wordCount = textContent.trim() ? textContent.trim().split(/\s+/).length : 0;
     const charCount = textContent.length;
     const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-    const isTableActive = editor.isActive('table');
+    const isTableActive = Boolean(editor && !editor.isDestroyed && editor.isActive('table'));
 
     return (
         <div className="tiptap-container">
@@ -843,7 +839,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                     <div
                         ref={previewRef}
                         className="tiptap"
-                        dangerouslySetInnerHTML={{ __html: editor.getHTML() }}
+                        dangerouslySetInnerHTML={{ __html: editor && !editor.isDestroyed ? editor.getHTML() : '' }}
                     />
                 </div>
             )}

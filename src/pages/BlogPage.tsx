@@ -45,7 +45,7 @@ const BlogPage: React.FC = () => {
                     title: post.title,
                     subtitle: post.subtitle || '',
                     description: post.description || '',
-                    imageUrl: post.image_url || (typeof post.content === 'object' ? post.content?.image_url : '') || '',
+                    imageUrl: post.image_url || (typeof post.content === 'object' && post.content !== null ? post.content?.image_url : '') || '',
                     category: post.category || 'geral',
                     tags: post.tags || [],
                     pinPosition: post.pin_position,
