@@ -68,6 +68,8 @@ const StudyNoteViewer: React.FC = () => {
 
             const processedHtml = addIdsToH2s(htmlContent);
 
+            const imageUrl = data.image_url || (typeof data.content === 'object' && data.content !== null ? data.content?.image_url : '') || '';
+
             setNote({
                 id: data.id,
                 slug: data.slug,
@@ -80,10 +82,50 @@ const StudyNoteViewer: React.FC = () => {
                 createdAt: data.created_at,
                 updatedAt: data.updated_at,
                 content: processedHtml || '',
+                imageUrl: imageUrl,
             });
         }
         setLoading(false);
     }, [addIdsToH2s]);
+
+    useEffect(() => {
+        if (!note) return;
+
+        const previousTitle = document.title;
+        document.title = `${note.title} | Blogfólio`;
+
+        const updateMeta = (attr: 'name' | 'property', name: string, content: string) => {
+            let el = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement | null;
+            if (!el) {
+                el = document.createElement('meta');
+                el.setAttribute(attr, name);
+                document.head.appendChild(el);
+            }
+            el.setAttribute('content', content);
+        };
+
+        const postUrl = window.location.href;
+        const postImg = note.imageUrl || 'https://matheusmorete.space/molde.webp';
+        const postDesc = note.description || note.subtitle || 'Desenvolvedor de Software. Busco a engenharia por trás do pixel e a lógica por trás da solução.';
+
+        updateMeta('property', 'og:title', note.title);
+        updateMeta('property', 'og:description', postDesc);
+        updateMeta('property', 'og:image', postImg);
+        updateMeta('property', 'og:url', postUrl);
+        updateMeta('name', 'twitter:title', note.title);
+        updateMeta('name', 'twitter:description', postDesc);
+        updateMeta('name', 'twitter:image', postImg);
+
+        return () => {
+            document.title = previousTitle;
+            updateMeta('property', 'og:title', 'Blogfólio');
+            updateMeta('property', 'og:description', 'Desenvolvedor de Software. Busco a engenharia por trás do pixel e a lógica por trás da solução.');
+            updateMeta('property', 'og:image', 'https://matheusmorete.space/molde.webp');
+            updateMeta('name', 'twitter:title', 'Blogfólio');
+            updateMeta('name', 'twitter:description', 'Desenvolvedor de Software. Busco a engenharia por trás do pixel e a lógica por trás da solução.');
+            updateMeta('name', 'twitter:image', 'https://matheusmorete.space/molde.webp');
+        };
+    }, [note]);
 
     useEffect(() => {
         if (id) {

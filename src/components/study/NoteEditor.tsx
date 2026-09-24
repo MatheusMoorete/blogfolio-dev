@@ -84,7 +84,7 @@ const NoteEditor: React.FC = () => {
                     createdAt: data.created_at,
                     updatedAt: data.updated_at,
                     content: htmlContent || '<p></p>',
-                    imageUrl: data.image_url || '',
+                    imageUrl: data.image_url || (typeof data.content === 'object' && data.content !== null ? data.content?.image_url : '') || '',
                 });
                 setStatus(data.status as 'draft' | 'published');
             }
