@@ -1,0 +1,229 @@
+/* Loading Post Retrô / Terminal */
+.post-loading-wrapper {
+  width: 100%;
+  min-height: 70vh;
+  background-color: #ffffff;
+  background-image: radial-gradient(circle, #e9e9e9 1px, transparent 1px);
+  background-size: 14px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  box-sizing: border-box;
+}
+
+.retro-loading-window {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border: 2px solid #0d0d0d;
+  border-radius: 0;
+  box-shadow: 6px 6px 0 #0d0d0d;
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', 'Fira Code', Menlo, Monaco, Consolas, monospace;
+  color: #0d0d0d;
+  box-sizing: border-box;
+}
+
+.retro-loading-titlebar {
+  background: #262626;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #0d0d0d;
+}
+
+.retro-loading-controls {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.retro-loading-dot {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid #ffffff;
+  border-radius: 50%;
+  background: transparent;
+  display: inline-block;
+}
+
+.retro-loading-filename {
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+}
+
+.retro-loading-content {
+  padding: 24px;
+}
+
+.retro-loading-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #0d0d0d;
+  margin: 0 0 6px 0;
+}
+
+.retro-loading-subtitle {
+  font-size: 0.85rem;
+  color: #6b6b6b;
+  line-height: 1.4;
+  margin: 0 0 22px 0;
+}
+
+.retro-loading-progress-track {
+  width: 100%;
+  height: 18px;
+  border: 2px solid #0d0d0d;
+  background: #ffffff;
+  padding: 2px;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.retro-loading-progress-fill {
+  height: 100%;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    #0d0d0d,
+    #0d0d0d 6px,
+    #ffffff 6px,
+    #ffffff 12px
+  );
+  animation: retroIndeterminate 2.4s ease-in-out infinite alternate,
+             retroStripeFlow 0.8s linear infinite;
+}
+
+@keyframes retroIndeterminate {
+  0% {
+    width: 18%;
+    transform: translateX(0%);
+  }
+  50% {
+    width: 55%;
+    transform: translateX(35%);
+  }
+  100% {
+    width: 28%;
+    transform: translateX(250%);
+  }
+}
+
+@keyframes retroStripeFlow {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 17px 0;
+  }
+}
+
+.retro-loading-status {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: #6b6b6b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 24px;
+}
+
+.retro-loading-console {
+  border: 2px solid #0d0d0d;
+  background: #fafafa;
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+
+.retro-loading-line {
+  display: block;
+  color: #0d0d0d;
+  opacity: 0;
+  animation: retroStepFade 0.2s steps(1) forwards;
+}
+
+.retro-loading-line:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.retro-loading-line:nth-child(2) {
+  animation-delay: 0.9s;
+}
+
+.retro-loading-line:nth-child(3) {
+  animation-delay: 1.6s;
+}
+
+.retro-loading-cursor-wrapper {
+  display: inline-block;
+  opacity: 0;
+  animation: retroStepFade 0.2s steps(1) forwards 1.6s;
+}
+
+.retro-loading-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 13px;
+  background-color: #0d0d0d;
+  vertical-align: -1px;
+  margin-left: 2px;
+  animation: retroBlink 0.85s steps(2, start) infinite 1.6s;
+}
+
+@keyframes retroStepFade {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes retroBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Redução de movimento */
+@media (prefers-reduced-motion: reduce) {
+  .retro-loading-progress-fill,
+  .retro-loading-line,
+  .retro-loading-cursor-wrapper,
+  .retro-loading-cursor {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+
+  .retro-loading-progress-fill {
+    width: 65% !important;
+    transform: none !important;
+  }
+
+  .retro-loading-cursor {
+    opacity: 1 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .retro-loading-content {
+    padding: 18px 16px;
+  }
+
+  .retro-loading-title {
+    font-size: 1.35rem;
+  }
+
+  .retro-loading-console {
+    font-size: 0.75rem;
+  }
+}

@@ -4,6 +4,7 @@ import { supabase } from '../../lib/supabase';
 import QuickNavigation from '../QuickNavigation';
 import type { StudyNote } from '../../types/study-notes';
 import { renderMermaidDiagrams } from '../../lib/renderMermaid';
+import PostLoading from './PostLoading';
 import './TiptapEditor.css';
 import './StudyNoteViewer.css';
 
@@ -146,7 +147,7 @@ const StudyNoteViewer: React.FC = () => {
         }
     }, [loading, note?.content]);
 
-    if (loading) return <div style={{ padding: '50px', textAlign: 'center' }}>Carregando post...</div>;
+    if (loading) return <PostLoading filename={id ? `${id}.md` : 'post.md'} />;
     if (!note) return <div style={{ padding: '50px', textAlign: 'center' }}>Ops! Post não encontrado. <Link to="/blog">Voltar ao Blog</Link></div>;
 
     return (
