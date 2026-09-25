@@ -6,7 +6,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|whatsapp|twitterbot|linkedinbot|telegrambot|discordbot|slackbot|skypeuripreview|vkshare|pinterest|embedly|quora|yahoo|bingbot|googlebot|applebot).*"
+          "value": ".*([Ll]inked[Ii]n|[Ff]acebook|[Tt]witter|[Ww]hats[Aa]pp|[Tt]elegram|[Dd]iscord|[Ss]lack|[Bb]ot|[Cc]rawl|[Ss]pider|[Pp]interest|[Ee]mbedly|[Gg]oogle|[Yy]ahoo|[Bb]ing|[Aa]pplebot|[Ff]acebot).*"
         }
       ],
       "destination": "/api/og?slug=:slug"

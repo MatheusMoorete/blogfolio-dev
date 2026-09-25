@@ -86,25 +86,36 @@ export default async function handler(req, res) {
   const safeImage = escapeHtml(meta.image);
   const safeUrl = escapeHtml(meta.url);
 
+  let imageMime = 'image/png';
+  if (safeImage.endsWith('.jpg') || safeImage.endsWith('.jpeg')) {
+    imageMime = 'image/jpeg';
+  } else if (safeImage.endsWith('.webp')) {
+    imageMime = 'image/webp';
+  }
+
   const html = `<!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" prefix="og: http://ogp.me/ns#">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${safeTitle}</title>
   <meta name="description" content="${safeDesc}">
 
-  <!-- Open Graph / Facebook / WhatsApp / LinkedIn / Discord -->
+  <!-- Open Graph / LinkedIn / Facebook / WhatsApp / Discord -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Blogfólio">
+  <meta property="og:locale" content="pt_BR">
   <meta property="og:title" content="${safeTitle}">
   <meta property="og:description" content="${safeDesc}">
+  <meta property="og:url" content="${safeUrl}">
   <meta property="og:image" content="${safeImage}">
+  <meta property="og:image:secure_url" content="${safeImage}">
+  <meta property="og:image:type" content="${imageMime}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:url" content="${safeUrl}">
+  <meta property="og:image:alt" content="${safeTitle}">
 
-  <!-- Twitter -->
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${safeTitle}">
   <meta name="twitter:description" content="${safeDesc}">
@@ -112,14 +123,14 @@ export default async function handler(req, res) {
 
   <link rel="canonical" href="${safeUrl}">
 
-  <!-- Redirect to SPA if opened by a human browser -->
-  <meta http-equiv="refresh" content="0;url=${safeUrl}">
   <script>
-    window.location.replace("${safeUrl}");
+    if (window.location.pathname.startsWith('/api')) {
+      window.location.replace("${safeUrl}");
+    }
   </script>
 </head>
 <body>
-  <p>Redirecionando para <a href="${safeUrl}">${safeTitle}</a>...</p>
+  <p><a href="${safeUrl}">${safeTitle}</a></p>
 </body>
 </html>`;
 
