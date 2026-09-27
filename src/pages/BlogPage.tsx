@@ -6,6 +6,8 @@ import { supabase } from '../lib/supabase';
 import './Blog.css';
 import type { StudyNote } from '../types/study-notes';
 import { MOCK_NOTES } from '../data/mock-notes';
+import { DICTIONARY_TERMS } from '../data/dictionary';
+import { BookMarked, BookOpen, ArrowUpRight } from 'lucide-react';
 
 const BlogPage: React.FC = () => {
     const navigate = useNavigate();
@@ -67,13 +69,63 @@ const BlogPage: React.FC = () => {
 
     return (
         <div className="blog-page-container">
-            <div style={{ marginBottom: '2rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="blog-header-wrapper">
+                <div className="blog-header-top-row">
                     <h1 style={{ margin: 0 }}>{t('blogTitle')}</h1>
+                    <button
+                        className="retro-button-secondary blog-header-dict-btn"
+                        onClick={() => navigate('/dicionario')}
+                        title="Explorar o Dicionário Frontend"
+                    >
+                        <BookMarked size={14} />
+                        <span>Dicionário Frontend</span>
+                    </button>
                 </div>
-                <p className="blog-page-subtitle" style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '1.1rem', maxWidth: '800px' }}>
+                <p className="blog-page-subtitle">
                     {t('blogSubtitle')}
                 </p>
+            </div>
+
+            {/* Banner Retrô do Dicionário dentro do Blog */}
+            <div className="blog-dictionary-banner">
+                <Window title="C:\WINDOWS\system32\dicionario_frontend.exe">
+                    <div className="blog-dict-content">
+                        <div className="blog-dict-info">
+                            <div className="blog-dict-badge-row">
+                                <span className="blog-dict-badge">GLOSSÁRIO TÉCNICO</span>
+                                <span className="blog-dict-count">{DICTIONARY_TERMS.length} termos catalogados</span>
+                            </div>
+                            <h2 className="blog-dict-title">Dicionário Frontend</h2>
+                            <p className="blog-dict-desc">
+                                Definições objetivas dos principais conceitos e APIs da Web linkadas nos artigos do blog (como <code>window</code>, <code>dom</code>, <code>closure</code>, <code>virtual-dom</code>).
+                            </p>
+                            <div className="blog-dict-quick-terms">
+                                <span className="quick-terms-label">Acesso rápido:</span>
+                                {DICTIONARY_TERMS.slice(0, 5).map((term) => (
+                                    <button
+                                        key={term.slug}
+                                        type="button"
+                                        className="quick-term-chip"
+                                        onClick={() => navigate(`/dicionario/${term.slug}`)}
+                                        title={`Ver definição de ${term.term}`}
+                                    >
+                                        #{term.slug}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="blog-dict-action">
+                            <button
+                                className="retro-button blog-dict-open-btn"
+                                onClick={() => navigate('/dicionario')}
+                            >
+                                <BookOpen size={15} />
+                                <span>Abrir Dicionário</span>
+                                <ArrowUpRight size={14} />
+                            </button>
+                        </div>
+                    </div>
+                </Window>
             </div>
 
             <div className="blog-post-list">

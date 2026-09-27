@@ -53,7 +53,6 @@ const Navbar: React.FC = () => {
                     <Link to="/#projects" className="navbar-link" onClick={(e) => handleNavClick(e, 'projects')}>{t('projects')}</Link>
                     <Link to="/#about" className="navbar-link" onClick={(e) => handleNavClick(e, 'about')}>{t('about')}</Link>
                     <Link to="/#contact" className="navbar-link" onClick={(e) => handleNavClick(e, 'contact')}>{t('contact')}</Link>
-                    <Link to="/dicionario" className="navbar-link" onClick={() => setIsMenuOpen(false)}>{t('dictionary')}</Link>
                 </div>
             </div>
         </nav>

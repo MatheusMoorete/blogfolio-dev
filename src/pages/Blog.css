@@ -16,11 +16,155 @@
   gap: 1rem;
 }
 
-.blog-page-subtitle {
-  margin: 0.5rem 0 0 0;
+.blog-header-wrapper {
+  margin-bottom: 2rem;
+}
+
+.blog-header-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.blog-header-dict-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  box-shadow: 2px 2px 0px var(--border-color);
+  transition: all 0.1s ease;
+}
+
+.blog-header-dict-btn:hover {
+  background: var(--border-color);
+  color: #ffffff;
+  box-shadow: 1px 1px 0px #000;
+  transform: translate(1px, 1px);
+}
+
+/* Banner do Dicionário dentro do Blog */
+.blog-dictionary-banner {
+  margin-bottom: 2.5rem;
+}
+
+.blog-dict-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.25rem;
+  background: #fbfbfb;
+  flex-wrap: wrap;
+}
+
+.blog-dict-info {
+  flex: 1;
+  min-width: 280px;
+}
+
+.blog-dict-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.blog-dict-badge {
+  background: #1a1a1a;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+
+.blog-dict-count {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
   color: #666;
-  font-size: 1.1rem;
-  max-width: 800px;
+}
+
+.blog-dict-title {
+  font-family: var(--font-mono);
+  font-size: 1.35rem;
+  margin: 0 0 0.5rem 0;
+  color: #1a1a1a;
+}
+
+.blog-dict-desc {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #555;
+  margin: 0 0 1rem 0;
+  max-width: 620px;
+}
+
+.blog-dict-desc code {
+  background: #eee;
+  padding: 1px 5px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+}
+
+.blog-dict-quick-terms {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.quick-terms-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: #777;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.quick-term-chip {
+  background: #ffffff;
+  border: 1px solid #1a1a1a;
+  box-shadow: 1px 1px 0px #1a1a1a;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  color: #000;
+}
+
+.quick-term-chip:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+.blog-dict-action {
+  flex-shrink: 0;
+}
+
+.blog-dict-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .blog-post-list {
