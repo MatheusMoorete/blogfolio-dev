@@ -161,7 +161,7 @@ const DictionaryPage: React.FC = () => {
                                             className="retro-button-card"
                                             onClick={() => navigate(`/dicionario/${term.slug}`)}
                                         >
-                                            <span>Ver artigo</span>
+                                            <span>Ver</span>
                                             <ArrowUpRight size={13} />
                                         </button>
                                     </div>
