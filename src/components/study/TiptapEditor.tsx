@@ -20,6 +20,7 @@ import { Callout, type CalloutType } from './extensions/Callout';
 import { InlineQuote } from './extensions/InlineQuote';
 import { renderMermaidDiagrams } from '../../lib/renderMermaid';
 import { markdownToHtml, htmlToMarkdown } from '../../lib/markdown';
+import { DICTIONARY_TERMS } from '../../data/dictionary';
 
 import {
     Bold,
@@ -57,6 +58,7 @@ import {
     AlertTriangle,
     Info,
     Bookmark,
+    BookOpen,
     Columns,
     Rows,
     Trash2,
@@ -272,7 +274,13 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             editor.chain().focus().extendMarkRange('link').unsetLink().run();
         } else {
             let validUrl = linkModal.url.trim();
-            if (!validUrl.startsWith('http://') && !validUrl.startsWith('https://') && !validUrl.startsWith('mailto:')) {
+            if (
+                !validUrl.startsWith('http://') &&
+                !validUrl.startsWith('https://') &&
+                !validUrl.startsWith('mailto:') &&
+                !validUrl.startsWith('/') &&
+                !validUrl.startsWith('#')
+            ) {
                 validUrl = `https://${validUrl}`;
             }
 
@@ -674,6 +682,26 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
                                 <button
                                     type="button"
+                                    onClick={() => {
+                                        const { from, to } = editor.state.selection;
+                                        const selectedText = editor.state.doc.textBetween(from, to, ' ') || '';
+                                        const matched = DICTIONARY_TERMS.find(t => 
+                                            t.slug.toLowerCase() === selectedText.trim().toLowerCase() ||
+                                            t.term.toLowerCase() === selectedText.trim().toLowerCase()
+                                        );
+                                        setLinkModal({
+                                            isOpen: true,
+                                            url: matched ? `/dicionario/${matched.slug}` : '',
+                                            text: selectedText,
+                                        });
+                                    }}
+                                    title="Vincular Termo do Dicionário Frontend"
+                                >
+                                    <BookOpen size={15} />
+                                </button>
+
+                                <button
+                                    type="button"
                                     onClick={() => setImageModal({ isOpen: true, url: '', alt: '' })}
                                     title="Inserir Imagem"
                                 >
@@ -875,7 +903,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                                 <input
                                     type="text"
                                     autoFocus
-                                    placeholder="https://exemplo.com"
+                                    placeholder="https://exemplo.com ou /dicionario/window"
                                     value={linkModal.url}
                                     onChange={e => setLinkModal(prev => ({ ...prev, url: e.target.value }))}
                                     onKeyDown={e => {
@@ -885,6 +913,44 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                                         }
                                     }}
                                 />
+                            </div>
+
+                            <div className="tiptap-modal-field" style={{ marginTop: '0.8rem', borderTop: '1px dashed #d5d5d5', paddingTop: '0.8rem' }}>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: '#444' }}>
+                                    <BookOpen size={13} />
+                                    <span>Ou selecione um termo do Dicionário Frontend:</span>
+                                </label>
+                                <select
+                                    onChange={(e) => {
+                                        if (e.target.value) {
+                                            const term = DICTIONARY_TERMS.find(t => t.slug === e.target.value);
+                                            if (term) {
+                                                setLinkModal(prev => ({
+                                                    ...prev,
+                                                    url: `/dicionario/${term.slug}`,
+                                                    text: prev.text || term.term
+                                                }));
+                                            }
+                                        }
+                                    }}
+                                    defaultValue=""
+                                    style={{
+                                        padding: '7px 10px',
+                                        fontSize: '0.82rem',
+                                        width: '100%',
+                                        border: '1px solid #1a1a1a',
+                                        borderRadius: '2px',
+                                        background: '#fafafa',
+                                        fontFamily: 'var(--font-mono, monospace)'
+                                    }}
+                                >
+                                    <option value="">-- Escolher termo catalogado --</option>
+                                    {DICTIONARY_TERMS.map(t => (
+                                        <option key={t.slug} value={t.slug}>
+                                            {t.term} ({t.category})
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         </div>
                         <div className="tiptap-modal-actions">

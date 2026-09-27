@@ -56,3 +56,25 @@
         max-width: 100%;
     }
 }
+
+/* Links do Dicionário Frontend nos Posts */
+a.dictionary-term-linked,
+a[href*="/dicionario/"],
+.dictionary-term {
+    color: #0b57d0;
+    text-decoration: underline dotted 2px #0b57d0;
+    text-underline-offset: 4px;
+    font-weight: 600;
+    padding: 1px 3px;
+    border-radius: 2px;
+    transition: all 0.15s ease;
+    cursor: help;
+}
+
+a.dictionary-term-linked:hover,
+a[href*="/dicionario/"]:hover,
+.dictionary-term:hover {
+    background-color: #e8f0fe;
+    color: #04388b;
+    text-decoration: underline solid 2px #04388b;
+}

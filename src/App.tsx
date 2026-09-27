@@ -11,6 +11,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 // Lazy load heavy components
 const NoteEditor = lazy(() => import('./components/study/NoteEditor'));
 const StudyNoteViewer = lazy(() => import('./components/study/StudyNoteViewer'));
+const DictionaryPage = lazy(() => import('./pages/DictionaryPage'));
+const DictionaryTermPage = lazy(() => import('./pages/DictionaryTermPage'));
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const BSOD = lazy(() => import('./components/easter-eggs/BSOD'));
 const HackerMode = lazy(() => import('./components/easter-eggs/HackerMode'));
@@ -54,6 +56,8 @@ const App: React.FC = () => {
               <Route path="/" element={<LandingPage />} />
               <Route path="/blog" element={<BlogPage />} />
               <Route path="/blog/:id" element={<StudyNoteViewer />} />
+              <Route path="/dicionario" element={<DictionaryPage />} />
+              <Route path="/dicionario/:slug" element={<DictionaryTermPage />} />
               <Route path="/admin" element={<Login />} />
               <Route
                 path="/admin/dashboard"

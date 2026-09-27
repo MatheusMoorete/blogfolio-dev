@@ -14,6 +14,7 @@ const translations = {
     about: "Sobre Mim",
     blog: "Blog",
     contact: "Contatos",
+    dictionary: "Dicionário",
     fromBlog: "Do blog",
     viewAll: "Ver todos os posts",
     backToBlog: "← Voltar para o blog",

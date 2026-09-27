@@ -1,0 +1,108 @@
+.retro-dictionary-tooltip {
+    position: absolute;
+    z-index: 99999;
+    width: 320px;
+    max-width: 90vw;
+    background: #ffffff;
+    border: 2px solid var(--border-color, #1a1a1a);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.9);
+    font-family: var(--font-sans, 'IBM Plex Sans', sans-serif);
+    animation: retroFadeIn 0.15s ease-out;
+    pointer-events: auto;
+}
+
+@keyframes retroFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.tooltip-header {
+    background: #e8e8e8;
+    border-bottom: 2px solid var(--border-color, #1a1a1a);
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.tooltip-title-area {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono, 'JetBrains Mono', monospace);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #000;
+}
+
+.tooltip-icon {
+    stroke-width: 2.2;
+}
+
+.tooltip-category-badge {
+    font-size: 0.65rem;
+    font-family: var(--font-mono, monospace);
+    background: #1a1a1a;
+    color: #ffffff;
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.tooltip-body {
+    padding: 10px 12px;
+    background: #ffffff;
+}
+
+.tooltip-summary {
+    font-size: 0.82rem;
+    line-height: 1.45;
+    color: #2b2b2b;
+    margin: 0;
+}
+
+.tooltip-footer {
+    padding: 8px 12px;
+    background: #f7f7f7;
+    border-top: 1px dashed #d0d0d0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.tooltip-open-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 1px solid #1a1a1a;
+    box-shadow: 2px 2px 0px #1a1a1a;
+    color: #000000;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.tooltip-open-button:hover {
+    background: #1a1a1a;
+    color: #ffffff;
+    box-shadow: 1px 1px 0px #000000;
+    transform: translate(1px, 1px);
+}
+
+.tooltip-open-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+}

@@ -5,6 +5,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { supabase } from '../lib/supabase';
 import './Blog.css';
 import type { StudyNote } from '../types/study-notes';
+import { MOCK_NOTES } from '../data/mock-notes';
 
 const BlogPage: React.FC = () => {
     const navigate = useNavigate();
@@ -23,7 +24,8 @@ const BlogPage: React.FC = () => {
 
             if (error) {
                 console.error('Error fetching posts:', error);
-            } else if (data) {
+                setPosts(MOCK_NOTES);
+            } else if (data && data.length > 0) {
                 interface DatabasePost {
                     id: string;
                     slug: string;
@@ -54,6 +56,8 @@ const BlogPage: React.FC = () => {
                     content: typeof post.content === 'string' ? post.content : (post.content?.html || ''),
                 }));
                 setPosts(mappedPosts);
+            } else {
+                setPosts(MOCK_NOTES);
             }
             setLoading(false);
         };

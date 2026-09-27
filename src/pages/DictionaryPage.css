@@ -1,0 +1,279 @@
+.dictionary-page-container {
+    padding: 1.5rem 20px 4rem 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    font-family: var(--font-sans);
+}
+
+.dictionary-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.dictionary-title-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.dictionary-header-icon {
+    margin-top: 6px;
+    color: #000;
+}
+
+.dictionary-page-title {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    margin: 0 0 0.3rem 0;
+    line-height: 1.1;
+}
+
+.dictionary-page-subtitle {
+    margin: 0;
+    color: #666;
+    font-size: 1rem;
+    max-width: 650px;
+    line-height: 1.4;
+}
+
+.dictionary-stats-badge {
+    background: #1a1a1a;
+    color: #ffffff;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 2px;
+    white-space: nowrap;
+    box-shadow: 2px 2px 0px #888;
+}
+
+.dictionary-search-window {
+    margin-bottom: 2rem;
+}
+
+.dictionary-controls-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dictionary-search-box {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+}
+
+.search-input-icon {
+    position: absolute;
+    left: 12px;
+    color: #888;
+    pointer-events: none;
+}
+
+.dictionary-search-input {
+    width: 100%;
+    padding: 10px 38px 10px 38px;
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    border: none;
+    outline: none;
+    background: transparent;
+}
+
+.dictionary-search-input:focus {
+    background: #fafafa;
+}
+
+.search-clear-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.search-clear-btn:hover {
+    color: #000;
+}
+
+.dictionary-category-filters {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.category-filter-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #555;
+    text-transform: uppercase;
+}
+
+.category-buttons-group {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.category-filter-btn {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    box-shadow: 1px 1px 0px var(--border-color);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+}
+
+.category-filter-btn:hover {
+    background: #f0f0f0;
+}
+
+.category-filter-btn.active {
+    background: #1a1a1a;
+    color: #ffffff;
+    box-shadow: none;
+    transform: translate(1px, 1px);
+}
+
+.dictionary-terms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 1.5rem;
+}
+
+.dictionary-term-card-window {
+    height: 100%;
+}
+
+.dictionary-term-card-window .retro-window-content {
+    height: calc(100% - 32px);
+    display: flex;
+    flex-direction: column;
+}
+
+.dictionary-term-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.card-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.card-term-title {
+    font-family: var(--font-mono);
+    font-size: 1.15rem;
+    margin: 0;
+    cursor: pointer;
+    line-height: 1.2;
+    transition: color 0.1s ease;
+}
+
+.card-term-title:hover {
+    color: #0b57d0;
+    text-decoration: underline;
+}
+
+.card-category-tag {
+    background: #f2f2f2;
+    border: 1px solid #d5d5d5;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.card-term-summary {
+    font-size: 0.85rem;
+    line-height: 1.45;
+    color: #333;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding-top: 0.75rem;
+    border-top: 1px dashed #dcdcdc;
+}
+
+.card-keywords-preview {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.card-kw-chip {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: #666;
+}
+
+.retro-button-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #ffffff;
+    border: 1px solid #1a1a1a;
+    box-shadow: 2px 2px 0px #1a1a1a;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    white-space: nowrap;
+}
+
+.retro-button-card:hover {
+    background: #1a1a1a;
+    color: #ffffff;
+    box-shadow: 1px 1px 0px #000;
+    transform: translate(1px, 1px);
+}
+
+.dictionary-empty-state {
+    padding: 2.5rem;
+    text-align: center;
+}
+
+.empty-state-title {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-desc {
+    color: #666;
+    margin-bottom: 1.25rem;
+    font-size: 0.9rem;
+}

@@ -3,8 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import QuickNavigation from '../QuickNavigation';
 import type { StudyNote } from '../../types/study-notes';
+import { MOCK_NOTES } from '../../data/mock-notes';
 import { renderMermaidDiagrams } from '../../lib/renderMermaid';
 import PostLoading from './PostLoading';
+import DictionaryTooltip from '../dictionary/DictionaryTooltip';
+import { useDictionaryTooltip } from '../../hooks/useDictionaryTooltip';
 import './TiptapEditor.css';
 import './StudyNoteViewer.css';
 
@@ -13,6 +16,14 @@ const StudyNoteViewer: React.FC = () => {
     const [note, setNote] = useState<StudyNote | null>(null);
     const [loading, setLoading] = useState(true);
     const contentRef = useRef<HTMLDivElement>(null);
+
+    const {
+        activeTerm,
+        position,
+        visible,
+        handleTooltipMouseEnter,
+        handleTooltipMouseLeave,
+    } = useDictionaryTooltip(contentRef);
 
     const addIdsToH2s = useCallback((html: string): string => {
         const parser = new DOMParser();
@@ -37,7 +48,11 @@ const StudyNoteViewer: React.FC = () => {
             .single();
 
         if (error) {
-            console.error('Error fetching post:', error);
+            console.error('Error fetching post from supabase:', error);
+            const mock = MOCK_NOTES.find(n => n.slug === slug);
+            if (mock) {
+                setNote(mock);
+            }
         } else if (data) {
             let htmlContent = '';
             if (typeof data.content === 'string') {
@@ -214,6 +229,14 @@ __________________________________________________________________`}
                     </div>
                 </main>
             </div>
+
+            <DictionaryTooltip
+                term={activeTerm}
+                position={position}
+                visible={visible}
+                onMouseEnter={handleTooltipMouseEnter}
+                onMouseLeave={handleTooltipMouseLeave}
+            />
         </div>
     );
 };
