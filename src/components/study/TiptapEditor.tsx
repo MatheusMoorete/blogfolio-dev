@@ -60,6 +60,8 @@ import {
     Bookmark,
     BookOpen,
     Search,
+    Sparkles,
+    CheckCircle2,
     Columns,
     Rows,
     Trash2,
@@ -90,11 +92,19 @@ interface ImageModalState {
     alt: string;
 }
 
+interface DetectedTerm {
+    term: (typeof DICTIONARY_TERMS)[number];
+    count: number;
+    alreadyLinked: boolean;
+}
+
 interface DictionaryModalState {
     isOpen: boolean;
     selectedSlug: string;
     displayText: string;
     search: string;
+    detectedTerms: DetectedTerm[];
+    feedbackMessage: string;
 }
 
 const TiptapEditor: React.FC<TiptapEditorProps> = ({
@@ -111,7 +121,9 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         isOpen: false,
         selectedSlug: '',
         displayText: '',
-        search: ''
+        search: '',
+        detectedTerms: [],
+        feedbackMessage: '',
     });
     const [calloutMenuOpen, setCalloutMenuOpen] = useState(false);
     const [tableMenuOpen, setTableMenuOpen] = useState(false);
@@ -322,10 +334,136 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
         setImageModal({ isOpen: false, url: '', alt: '' });
     };
 
+    // Analisa o texto do artigo procurando por termos cadastrados no dicionário
+    const scanArticleForTerms = (html: string): DetectedTerm[] => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+                const parent = node.parentElement;
+                if (!parent || parent.closest('a, pre, code')) {
+                    return NodeFilter.FILTER_REJECT;
+                }
+                return NodeFilter.FILTER_ACCEPT;
+            }
+        });
+
+        let fullUnlinkedText = '';
+        let node: Node | null;
+        while ((node = walker.nextNode())) {
+            fullUnlinkedText += ' ' + (node.textContent || '');
+        }
+
+        const existingLinks = Array.from(doc.querySelectorAll('a[href*="/dicionario/"], [data-dictionary]'));
+        const linkedSlugs = new Set(
+            existingLinks.map(el => {
+                const match = (el.getAttribute('href') || '').match(/\/dicionario\/([a-zA-Z0-9_-]+)/);
+                return el.getAttribute('data-dictionary') || (match ? match[1] : '');
+            }).filter(Boolean)
+        );
+
+        const detected: DetectedTerm[] = [];
+
+        for (const term of DICTIONARY_TERMS) {
+            const patternWords = [term.term, term.slug, ...term.keywords.slice(0, 2)];
+            const regexParts = patternWords.map(w => w.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
+            const regex = new RegExp(`\\b(${regexParts.join('|')})\\b`, 'gi');
+
+            const matches = fullUnlinkedText.match(regex);
+            const count = matches ? matches.length : 0;
+            const isLinked = linkedSlugs.has(term.slug);
+
+            if (count > 0 || isLinked) {
+                detected.push({
+                    term,
+                    count,
+                    alreadyLinked: isLinked
+                });
+            }
+        }
+
+        return detected;
+    };
+
+    // Substitui termos em nós de texto por links formatados do Dicionário
+    const autoLinkTermsInHtml = (html: string, targetSlugs?: string[]): { newHtml: string; count: number } => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const termsToLink = targetSlugs && targetSlugs.length > 0
+            ? DICTIONARY_TERMS.filter(t => targetSlugs.includes(t.slug))
+            : DICTIONARY_TERMS;
+
+        let totalCount = 0;
+
+        const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+                const parent = node.parentElement;
+                if (!parent || parent.closest('a, pre, code')) {
+                    return NodeFilter.FILTER_REJECT;
+                }
+                if (!node.textContent || !node.textContent.trim()) {
+                    return NodeFilter.FILTER_REJECT;
+                }
+                return NodeFilter.FILTER_ACCEPT;
+            }
+        });
+
+        const textNodes: Text[] = [];
+        let currentNode: Node | null;
+        while ((currentNode = walker.nextNode())) {
+            textNodes.push(currentNode as Text);
+        }
+
+        const sortedTerms = [...termsToLink].sort((a, b) => b.term.length - a.term.length);
+
+        for (const textNode of textNodes) {
+            const currentText = textNode.textContent || '';
+
+            for (const term of sortedTerms) {
+                const patternWords = [term.term, term.slug];
+                const regexParts = patternWords.map(w => w.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&'));
+                const regex = new RegExp(`\\b(${regexParts.join('|')})\\b`, 'i');
+
+                const match = currentText.match(regex);
+                if (match && match.index !== undefined) {
+                    const matchedWord = match[0];
+                    const before = currentText.substring(0, match.index);
+                    const after = currentText.substring(match.index + matchedWord.length);
+
+                    const linkEl = doc.createElement('a');
+                    linkEl.href = `/dicionario/${term.slug}`;
+                    linkEl.className = 'dictionary-term-linked';
+                    linkEl.setAttribute('data-dictionary', term.slug);
+                    linkEl.setAttribute('target', '_blank');
+                    linkEl.setAttribute('rel', 'noopener noreferrer');
+                    linkEl.textContent = matchedWord;
+
+                    const fragment = doc.createDocumentFragment();
+                    if (before) fragment.appendChild(doc.createTextNode(before));
+                    fragment.appendChild(linkEl);
+                    if (after) fragment.appendChild(doc.createTextNode(after));
+
+                    if (textNode.parentNode) {
+                        textNode.parentNode.replaceChild(fragment, textNode);
+                    }
+                    totalCount++;
+                    break;
+                }
+            }
+        }
+
+        return { newHtml: doc.body.innerHTML, count: totalCount };
+    };
+
     const openDictionaryModal = () => {
         const { from, to } = editor.state.selection;
         const selectedText = editor.state.doc.textBetween(from, to, ' ') || '';
         const cleanText = selectedText.trim();
+
+        const currentHtml = editor.getHTML();
+        const detected = scanArticleForTerms(currentHtml);
 
         // Tenta achar termo pelo texto selecionado
         const matched = DICTIONARY_TERMS.find(t =>
@@ -336,10 +474,54 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
         setDictionaryModal({
             isOpen: true,
-            selectedSlug: matched ? matched.slug : (DICTIONARY_TERMS[0]?.slug || ''),
+            selectedSlug: matched ? matched.slug : (cleanText ? '' : (detected[0]?.term.slug || DICTIONARY_TERMS[0]?.slug || '')),
             displayText: cleanText,
             search: '',
+            detectedTerms: detected,
+            feedbackMessage: '',
         });
+    };
+
+    const handleAutoLinkTerm = (slug: string) => {
+        const currentHtml = editor.getHTML();
+        const { newHtml, count } = autoLinkTermsInHtml(currentHtml, [slug]);
+        if (count > 0) {
+            editor.commands.setContent(newHtml, { emitUpdate: true });
+            const updated = scanArticleForTerms(newHtml);
+            setDictionaryModal(prev => ({
+                ...prev,
+                detectedTerms: updated,
+                feedbackMessage: `✨ Termo "${slug}" vinculado com sucesso (${count} ocorrência(s))!`
+            }));
+        } else {
+            setDictionaryModal(prev => ({
+                ...prev,
+                feedbackMessage: `Nenhuma ocorrência não-vinculada encontrada para "${slug}".`
+            }));
+        }
+    };
+
+    const handleAutoLinkAll = () => {
+        const currentHtml = editor.getHTML();
+        const unlinkedSlugs = dictionaryModal.detectedTerms
+            .filter(d => !d.alreadyLinked || d.count > 0)
+            .map(d => d.term.slug);
+
+        const { newHtml, count } = autoLinkTermsInHtml(currentHtml, unlinkedSlugs.length > 0 ? unlinkedSlugs : undefined);
+        if (count > 0) {
+            editor.commands.setContent(newHtml, { emitUpdate: true });
+            const updated = scanArticleForTerms(newHtml);
+            setDictionaryModal(prev => ({
+                ...prev,
+                detectedTerms: updated,
+                feedbackMessage: `🎉 Sucesso! ${count} ocorrência(s) de termos vinculadas automaticamente ao Dicionário!`
+            }));
+        } else {
+            setDictionaryModal(prev => ({
+                ...prev,
+                feedbackMessage: 'Todos os termos encontrados no artigo já estão vinculados!'
+            }));
+        }
     };
 
     const handleInsertDictionaryTerm = () => {
@@ -356,7 +538,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             editor.chain().focus().extendMarkRange('link').setLink({ href: termUrl }).run();
         }
 
-        setDictionaryModal({ isOpen: false, selectedSlug: '', displayText: '', search: '' });
+        setDictionaryModal({ isOpen: false, selectedSlug: '', displayText: '', search: '', detectedTerms: [], feedbackMessage: '' });
     };
 
     const toggleCallout = (type: CalloutType) => {
@@ -875,6 +1057,13 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                         >
                             <LinkIcon size={13} />
                         </button>
+                        <button
+                            type="button"
+                            onClick={openDictionaryModal}
+                            title="Vincular ao Dicionário Frontend (com Hover Preview)"
+                        >
+                            <BookOpen size={13} />
+                        </button>
                     </BubbleMenu>
                 </>
             )}
@@ -1109,8 +1298,143 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                         </div>
 
                         <div className="tiptap-modal-body">
+                            {/* Feedback de sucesso de vinculação automática */}
+                            {dictionaryModal.feedbackMessage && (
+                                <div style={{
+                                    marginBottom: '12px',
+                                    padding: '8px 12px',
+                                    background: '#e6fffa',
+                                    border: '1px solid #38b2ac',
+                                    borderRadius: '2px',
+                                    fontSize: '0.8rem',
+                                    fontFamily: 'var(--font-mono, monospace)',
+                                    color: '#234e52',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                }}>
+                                    <CheckCircle2 size={15} color="#319795" />
+                                    <span>{dictionaryModal.feedbackMessage}</span>
+                                </div>
+                            )}
+
+                            {/* SEÇÃO INTELIGENTE: Termos detectados automaticamente no artigo */}
+                            <div style={{
+                                marginBottom: '16px',
+                                padding: '10px 12px',
+                                background: '#f4f4f5',
+                                border: '1px solid #d4d4d8',
+                                borderRadius: '2px'
+                            }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <label style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.82rem', fontWeight: 'bold' }}>
+                                        <Sparkles size={14} color="#d97706" />
+                                        <span>Termos Detectados no Artigo ({dictionaryModal.detectedTerms.length}):</span>
+                                    </label>
+                                    {dictionaryModal.detectedTerms.some(d => !d.alreadyLinked || d.count > 0) && (
+                                        <button
+                                            type="button"
+                                            onClick={handleAutoLinkAll}
+                                            style={{
+                                                background: '#1a1a1a',
+                                                color: '#fff',
+                                                border: '1px solid #000',
+                                                boxShadow: '1px 1px 0 #000',
+                                                fontSize: '0.72rem',
+                                                fontFamily: 'var(--font-mono, monospace)',
+                                                fontWeight: 'bold',
+                                                padding: '3px 8px',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '4px'
+                                            }}
+                                            title="Encontra e transforma todas as palavras correspondentes do artigo em links com tooltip"
+                                        >
+                                            <Sparkles size={12} />
+                                            <span>Vincular Todos</span>
+                                        </button>
+                                    )}
+                                </div>
+
+                                {dictionaryModal.detectedTerms.length === 0 ? (
+                                    <p style={{ margin: 0, fontSize: '0.78rem', color: '#71717a', fontStyle: 'italic' }}>
+                                        Nenhum termo do catálogo foi detectado no texto até o momento.
+                                    </p>
+                                ) : (
+                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                        {dictionaryModal.detectedTerms.map(({ term, count, alreadyLinked }) => (
+                                            <div
+                                                key={term.slug}
+                                                style={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: '6px',
+                                                    background: '#ffffff',
+                                                    border: '1px solid #a1a1aa',
+                                                    padding: '3px 7px',
+                                                    fontSize: '0.74rem',
+                                                    fontFamily: 'var(--font-mono, monospace)',
+                                                    borderRadius: '2px'
+                                                }}
+                                            >
+                                                <strong>{term.term}</strong>
+                                                {count > 0 && (
+                                                    <span style={{ color: '#2563eb', fontWeight: 'bold' }}>
+                                                        ({count}x)
+                                                    </span>
+                                                )}
+                                                {alreadyLinked && count === 0 && (
+                                                    <span style={{ color: '#16a34a', fontSize: '0.68rem' }}>
+                                                        ✓ já vinculado
+                                                    </span>
+                                                )}
+                                                {count > 0 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleAutoLinkTerm(term.slug)}
+                                                        style={{
+                                                            background: '#f0fdf4',
+                                                            border: '1px solid #16a34a',
+                                                            color: '#15803d',
+                                                            fontSize: '0.68rem',
+                                                            fontWeight: 'bold',
+                                                            padding: '1px 5px',
+                                                            cursor: 'pointer',
+                                                            borderRadius: '2px'
+                                                        }}
+                                                        title={`Vincular todas as ${count} ocorrências de ${term.term}`}
+                                                    >
+                                                        + Vincular
+                                                    </button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div style={{
+                                textAlign: 'center',
+                                borderTop: '1px dashed #d4d4d8',
+                                margin: '10px 0',
+                                position: 'relative'
+                            }}>
+                                <span style={{
+                                    position: 'relative',
+                                    top: '-9px',
+                                    background: '#fff',
+                                    padding: '0 8px',
+                                    fontSize: '0.68rem',
+                                    color: '#888',
+                                    fontFamily: 'var(--font-mono, monospace)'
+                                }}>
+                                    OU VINCULAR SELEÇÃO MANUALMENTE
+                                </span>
+                            </div>
+
                             <div className="tiptap-modal-field">
-                                <label>Texto visível no post:</label>
+                                <label>Texto selecionado no post:</label>
                                 <input
                                     type="text"
                                     placeholder="Ex: window, DOM, Closures..."
@@ -1134,9 +1458,9 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                             </div>
 
                             <div className="tiptap-modal-field">
-                                <label>Selecione o termo correspondente:</label>
+                                <label>Termo do Dicionário a associar:</label>
                                 <div style={{
-                                    maxHeight: '180px',
+                                    maxHeight: '160px',
                                     overflowY: 'auto',
                                     border: '1px solid #1a1a1a',
                                     background: '#fafafa',
@@ -1219,7 +1543,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                                 className="tiptap-btn tiptap-btn-secondary"
                                 onClick={() => setDictionaryModal(prev => ({ ...prev, isOpen: false }))}
                             >
-                                Cancelar
+                                Fechar
                             </button>
                             <button
                                 type="button"
@@ -1227,7 +1551,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                                 onClick={handleInsertDictionaryTerm}
                                 disabled={!dictionaryModal.selectedSlug}
                             >
-                                <Check size={14} /> Vincular Termo
+                                <Check size={14} /> Vincular Palavra Selecionada
                             </button>
                         </div>
                     </div>
