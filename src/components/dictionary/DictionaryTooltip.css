@@ -1,6 +1,6 @@
 .retro-dictionary-tooltip {
-    position: absolute;
-    z-index: 99999;
+    position: fixed;
+    z-index: 999999;
     width: 320px;
     max-width: 90vw;
     background: #ffffff;

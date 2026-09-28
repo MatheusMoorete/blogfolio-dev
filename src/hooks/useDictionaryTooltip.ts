@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { getDictionaryTermBySlug } from '../data/dictionary';
 import type { DictionaryTerm } from '../types/dictionary';
 
-export const useDictionaryTooltip = (containerRef: React.RefObject<HTMLElement | null>) => {
+export const useDictionaryTooltip = (containerRef?: React.RefObject<HTMLElement | null>) => {
     const [activeTerm, setActiveTerm] = useState<DictionaryTerm | null>(null);
     const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
     const [visible, setVisible] = useState(false);
@@ -32,26 +32,42 @@ export const useDictionaryTooltip = (containerRef: React.RefObject<HTMLElement |
     }, [scheduleClose]);
 
     useEffect(() => {
-        const container = containerRef.current;
-        if (!container) return;
-
         const handleMouseOver = (e: MouseEvent) => {
             const target = e.target as HTMLElement | null;
             if (!target) return;
 
+            // Se for dentro do próprio tooltip, não re-dispara
+            if (target.closest('.retro-dictionary-tooltip')) {
+                cancelCloseTimer();
+                return;
+            }
+
+            // Se containerRef foi passado e está montado, garante que o alvo está dentro dele
+            if (containerRef && containerRef.current && !containerRef.current.contains(target)) {
+                return;
+            }
+
             // Busca por <a> com href para dicionario ou elemento com atributo data-dictionary
-            const linkElement = target.closest('a[href*="/dicionario/"], [data-dictionary]') as HTMLAnchorElement | HTMLElement | null;
+            const linkElement = target.closest('a[href*="/dicionario/"], [data-dictionary]') as HTMLElement | null;
             if (!linkElement) return;
 
-            let slug = '';
-            if (linkElement.getAttribute('data-dictionary')) {
-                slug = linkElement.getAttribute('data-dictionary') || '';
-            } else if (linkElement instanceof HTMLAnchorElement) {
+            let slug = linkElement.getAttribute('data-dictionary') || '';
+            if (!slug && linkElement instanceof HTMLAnchorElement) {
                 const href = linkElement.getAttribute('href') || '';
                 const match = href.match(/\/dicionario\/([a-zA-Z0-9_-]+)/);
                 if (match && match[1]) {
                     slug = match[1];
                 }
+            } else if (!slug) {
+                const href = linkElement.getAttribute('href') || '';
+                const match = href.match(/\/dicionario\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) {
+                    slug = match[1];
+                }
+            }
+
+            if (!slug) {
+                slug = (linkElement.textContent || '').trim().toLowerCase();
             }
 
             if (!slug) return;
@@ -74,18 +90,18 @@ export const useDictionaryTooltip = (containerRef: React.RefObject<HTMLElement |
             const tooltipWidth = 320;
             const tooltipHeight = 160;
 
-            // Posição no documento (considerando scroll da janela)
-            let left = rect.left + window.scrollX;
-            let top = rect.bottom + window.scrollY + 8;
+            // Posição fixa no viewport (position: fixed)
+            let left = rect.left;
+            let top = rect.bottom + 8;
 
             // Evita sair para a direita da tela
-            if (left + tooltipWidth > window.innerWidth - 20) {
-                left = Math.max(10, window.innerWidth - tooltipWidth - 20);
+            if (left + tooltipWidth > window.innerWidth - 16) {
+                left = Math.max(16, window.innerWidth - tooltipWidth - 16);
             }
 
             // Se for estourar embaixo, coloca em cima do termo
-            if (rect.bottom + tooltipHeight > window.innerHeight && rect.top > tooltipHeight) {
-                top = rect.top + window.scrollY - tooltipHeight - 8;
+            if (top + tooltipHeight > window.innerHeight - 10 && rect.top > tooltipHeight + 10) {
+                top = rect.top - tooltipHeight - 8;
             }
 
             setActiveTerm(foundTerm);
@@ -98,17 +114,48 @@ export const useDictionaryTooltip = (containerRef: React.RefObject<HTMLElement |
             if (!target) return;
 
             const linkElement = target.closest('a[href*="/dicionario/"], [data-dictionary]');
-            if (linkElement) {
-                scheduleClose();
+            if (!linkElement) return;
+
+            // Se for dentro do próprio tooltip, não fecha
+            if (linkElement.closest('.retro-dictionary-tooltip')) {
+                return;
+            }
+
+            const related = e.relatedTarget as HTMLElement | null;
+            // Se o cursor se moveu para um elemento filho do link, não fecha
+            if (related && linkElement.contains(related)) {
+                return;
+            }
+
+            // Se o cursor se moveu para dentro do tooltip, não fecha
+            if (related && related.closest && related.closest('.retro-dictionary-tooltip')) {
+                return;
+            }
+
+            scheduleClose();
+        };
+
+        const handleScroll = () => {
+            scheduleClose();
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setVisible(false);
+                setActiveTerm(null);
             }
         };
 
-        container.addEventListener('mouseover', handleMouseOver);
-        container.addEventListener('mouseout', handleMouseOut);
+        document.addEventListener('mouseover', handleMouseOver);
+        document.addEventListener('mouseout', handleMouseOut);
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        window.addEventListener('keydown', handleKeyDown);
 
         return () => {
-            container.removeEventListener('mouseover', handleMouseOver);
-            container.removeEventListener('mouseout', handleMouseOut);
+            document.removeEventListener('mouseover', handleMouseOver);
+            document.removeEventListener('mouseout', handleMouseOut);
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('keydown', handleKeyDown);
             cancelCloseTimer();
         };
     }, [containerRef, cancelCloseTimer, scheduleClose]);

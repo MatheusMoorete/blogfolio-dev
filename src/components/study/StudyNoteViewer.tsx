@@ -6,8 +6,6 @@ import type { StudyNote } from '../../types/study-notes';
 import { MOCK_NOTES } from '../../data/mock-notes';
 import { renderMermaidDiagrams } from '../../lib/renderMermaid';
 import PostLoading from './PostLoading';
-import DictionaryTooltip from '../dictionary/DictionaryTooltip';
-import { useDictionaryTooltip } from '../../hooks/useDictionaryTooltip';
 import './TiptapEditor.css';
 import './StudyNoteViewer.css';
 
@@ -16,14 +14,6 @@ const StudyNoteViewer: React.FC = () => {
     const [note, setNote] = useState<StudyNote | null>(null);
     const [loading, setLoading] = useState(true);
     const contentRef = useRef<HTMLDivElement>(null);
-
-    const {
-        activeTerm,
-        position,
-        visible,
-        handleTooltipMouseEnter,
-        handleTooltipMouseLeave,
-    } = useDictionaryTooltip(contentRef);
 
     const addIdsToH2s = useCallback((html: string): string => {
         const parser = new DOMParser();
@@ -245,14 +235,6 @@ __________________________________________________________________`}
                     </div>
                 </main>
             </div>
-
-            <DictionaryTooltip
-                term={activeTerm}
-                position={position}
-                visible={visible}
-                onMouseEnter={handleTooltipMouseEnter}
-                onMouseLeave={handleTooltipMouseLeave}
-            />
         </div>
     );
 };

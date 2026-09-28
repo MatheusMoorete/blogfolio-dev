@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { ExternalLink, BookOpen } from 'lucide-react';
 import type { DictionaryTerm } from '../../types/dictionary';
 import './DictionaryTooltip.css';
@@ -22,7 +23,7 @@ export const DictionaryTooltip: React.FC<DictionaryTooltipProps> = ({
 
     const termUrl = `/dicionario/${term.slug}`;
 
-    return (
+    return createPortal(
         <div
             className="retro-dictionary-tooltip"
             style={{
@@ -56,7 +57,8 @@ export const DictionaryTooltip: React.FC<DictionaryTooltipProps> = ({
                     <ExternalLink size={12} />
                 </a>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

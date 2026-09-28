@@ -7,6 +7,7 @@ import Login from './pages/admin/Login';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import CRTFilter from './components/effects/CRTFilter';
 import ErrorBoundary from './components/ErrorBoundary';
+import GlobalDictionaryTooltip from './components/dictionary/GlobalDictionaryTooltip';
 
 // Lazy load heavy components
 const NoteEditor = lazy(() => import('./components/study/NoteEditor'));
@@ -40,6 +41,7 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
+      <GlobalDictionaryTooltip />
       <Suspense fallback={null}>
         <HackerMode />
       </Suspense>
