@@ -16,7 +16,7 @@ export const MOCK_NOTES: StudyNote[] = [
             <h1>Entendendo Referências e Renderização</h1>
             <p>Quando trabalhamos com React e manipulamos o <a href="/dicionario/virtual-dom">Virtual DOM</a>, entender como o motor JavaScript lida com referências de objetos e <a href="/dicionario/closure">closures</a> é crucial para otimizar a performance da interface.</p>
             
-            <p>Em componentes complexos que interagem com a janela global <a href="/dicionario/window">window</a> através de event listeners, garantir a estabilidade referencial evita renderizações em cascata e vazamentos de memória.</p>
+            <p>Em componentes que registram event listeners ou passam callbacks para componentes memoizados, entender identidade e estabilidade referencial ajuda a controlar dependências, subscriptions e renderizações desnecessárias.</p>
 
             <pre><code>const MemoizedComponent = React.memo(({ handler }) => {
   console.log("Renderizou!");
@@ -50,10 +50,10 @@ const Parent = () => {
         updatedAt: '2026-01-16T18:00:00Z',
         content: `
             <h1>A Raiz de Tudo no Navegador</h1>
-            <p>Toda aplicação web moderna que roda no cliente opera sob o escopo de um objeto global: o <a href="/dicionario/window">window</a>. Ele não é apenas um repositório de variáveis globais; é a própria interface que o navegador expõe para que nosso código interaja com a aba, com a máquina do usuário e com o <a href="/dicionario/dom">DOM</a>.</p>
+            <p>Toda aplicação web que executa JavaScript no contexto principal de uma página possui acesso ao objeto global <a href="/dicionario/window">window</a>. Ele representa o contexto da janela ou aba e expõe diversas APIs do navegador, além de propriedades como <a href="/dicionario/document">document</a>, <code>location</code> e <code>history</code>.</p>
 
             <h2>Hierarquia e Segurança</h2>
-            <p>Quando escrevemos <code>document.querySelector()</code>, na realidade estamos acessando uma propriedade do <a href="/dicionario/window">window</a> (<a href="/dicionario/document">document</a>). Entender essa separação é o primeiro passo para arquitetar aplicações seguras, lidar com <a href="/dicionario/cors">CORS</a> em requisições assíncronas e evitar gargalos no <a href="/dicionario/event-loop">Event Loop</a>.</p>
+            <p>Quando escrevemos <code>document.querySelector()</code>, estamos utilizando o objeto <a href="/dicionario/document">document</a>, que também está disponível como <code>window.document</code>. Entender a relação entre <a href="/dicionario/window">window</a>, <a href="/dicionario/document">document</a> e o <a href="/dicionario/dom">DOM</a> ajuda a separar melhor as APIs fornecidas pelo navegador das estruturas da própria linguagem JavaScript.</p>
 
             <pre><code>// Verificação comum para ambientes com SSR e Hydration
 if (typeof window !== 'undefined') {
