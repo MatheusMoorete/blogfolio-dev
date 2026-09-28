@@ -59,6 +59,7 @@ import {
     Info,
     Bookmark,
     BookOpen,
+    Search,
     Columns,
     Rows,
     Trash2,
@@ -89,6 +90,13 @@ interface ImageModalState {
     alt: string;
 }
 
+interface DictionaryModalState {
+    isOpen: boolean;
+    selectedSlug: string;
+    displayText: string;
+    search: string;
+}
+
 const TiptapEditor: React.FC<TiptapEditorProps> = ({
     content,
     onChange,
@@ -99,6 +107,12 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
     const [markdownText, setMarkdownText] = useState<string>('');
     const [linkModal, setLinkModal] = useState<LinkModalState>({ isOpen: false, url: '', text: '' });
     const [imageModal, setImageModal] = useState<ImageModalState>({ isOpen: false, url: '', alt: '' });
+    const [dictionaryModal, setDictionaryModal] = useState<DictionaryModalState>({
+        isOpen: false,
+        selectedSlug: '',
+        displayText: '',
+        search: ''
+    });
     const [calloutMenuOpen, setCalloutMenuOpen] = useState(false);
     const [tableMenuOpen, setTableMenuOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -306,6 +320,43 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
             }).run();
         }
         setImageModal({ isOpen: false, url: '', alt: '' });
+    };
+
+    const openDictionaryModal = () => {
+        const { from, to } = editor.state.selection;
+        const selectedText = editor.state.doc.textBetween(from, to, ' ') || '';
+        const cleanText = selectedText.trim();
+
+        // Tenta achar termo pelo texto selecionado
+        const matched = DICTIONARY_TERMS.find(t =>
+            t.slug.toLowerCase() === cleanText.toLowerCase() ||
+            t.term.toLowerCase() === cleanText.toLowerCase() ||
+            t.keywords.some(k => k.toLowerCase() === cleanText.toLowerCase())
+        );
+
+        setDictionaryModal({
+            isOpen: true,
+            selectedSlug: matched ? matched.slug : (DICTIONARY_TERMS[0]?.slug || ''),
+            displayText: cleanText,
+            search: '',
+        });
+    };
+
+    const handleInsertDictionaryTerm = () => {
+        if (!dictionaryModal.selectedSlug) return;
+        const term = DICTIONARY_TERMS.find(t => t.slug === dictionaryModal.selectedSlug);
+        if (!term) return;
+
+        const textToDisplay = dictionaryModal.displayText.trim() || term.term;
+        const termUrl = `/dicionario/${term.slug}`;
+
+        if (editor.state.selection.empty && !dictionaryModal.displayText.trim()) {
+            editor.chain().focus().insertContent(`<a href="${termUrl}" class="dictionary-term-linked" data-dictionary="${term.slug}">${textToDisplay}</a>`).run();
+        } else {
+            editor.chain().focus().extendMarkRange('link').setLink({ href: termUrl }).run();
+        }
+
+        setDictionaryModal({ isOpen: false, selectedSlug: '', displayText: '', search: '' });
     };
 
     const toggleCallout = (type: CalloutType) => {
@@ -682,20 +733,8 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
 
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        const { from, to } = editor.state.selection;
-                                        const selectedText = editor.state.doc.textBetween(from, to, ' ') || '';
-                                        const matched = DICTIONARY_TERMS.find(t => 
-                                            t.slug.toLowerCase() === selectedText.trim().toLowerCase() ||
-                                            t.term.toLowerCase() === selectedText.trim().toLowerCase()
-                                        );
-                                        setLinkModal({
-                                            isOpen: true,
-                                            url: matched ? `/dicionario/${matched.slug}` : '',
-                                            text: selectedText,
-                                        });
-                                    }}
-                                    title="Vincular Termo do Dicionário Frontend"
+                                    onClick={openDictionaryModal}
+                                    title="Vincular Termo do Dicionário Frontend (com Hover Preview)"
                                 >
                                     <BookOpen size={15} />
                                 </button>
@@ -1038,6 +1077,157 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                                 disabled={!imageModal.url.trim()}
                             >
                                 <Check size={14} /> Inserir Imagem
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal de Vinculação com o Dicionário Frontend */}
+            {dictionaryModal.isOpen && (
+                <div
+                    className="tiptap-modal-overlay"
+                    onClick={() => setDictionaryModal(prev => ({ ...prev, isOpen: false }))}
+                >
+                    <div
+                        className="tiptap-modal"
+                        style={{ maxWidth: '480px', width: '92%' }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="tiptap-modal-header">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <BookOpen size={16} />
+                                <h3>Vincular Termo do Dicionário</h3>
+                            </div>
+                            <button
+                                type="button"
+                                className="tiptap-modal-close"
+                                onClick={() => setDictionaryModal(prev => ({ ...prev, isOpen: false }))}
+                            >
+                                <X size={16} />
+                            </button>
+                        </div>
+
+                        <div className="tiptap-modal-body">
+                            <div className="tiptap-modal-field">
+                                <label>Texto visível no post:</label>
+                                <input
+                                    type="text"
+                                    placeholder="Ex: window, DOM, Closures..."
+                                    value={dictionaryModal.displayText}
+                                    onChange={e => setDictionaryModal(prev => ({ ...prev, displayText: e.target.value }))}
+                                />
+                            </div>
+
+                            <div className="tiptap-modal-field">
+                                <label>Pesquisar termo no glossário:</label>
+                                <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                                    <Search size={14} style={{ position: 'absolute', left: '10px', color: '#888' }} />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar (ex: window, dom, loop, hook)..."
+                                        value={dictionaryModal.search}
+                                        onChange={e => setDictionaryModal(prev => ({ ...prev, search: e.target.value }))}
+                                        style={{ paddingLeft: '32px' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="tiptap-modal-field">
+                                <label>Selecione o termo correspondente:</label>
+                                <div style={{
+                                    maxHeight: '180px',
+                                    overflowY: 'auto',
+                                    border: '1px solid #1a1a1a',
+                                    background: '#fafafa',
+                                    padding: '4px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: '4px'
+                                }}>
+                                    {DICTIONARY_TERMS
+                                        .filter(t => {
+                                            if (!dictionaryModal.search.trim()) return true;
+                                            const s = dictionaryModal.search.toLowerCase();
+                                            return t.term.toLowerCase().includes(s) || t.slug.includes(s) || t.keywords.some(k => k.includes(s));
+                                        })
+                                        .map(term => {
+                                            const isSelected = dictionaryModal.selectedSlug === term.slug;
+                                            return (
+                                                <div
+                                                    key={term.slug}
+                                                    onClick={() => {
+                                                        setDictionaryModal(prev => ({
+                                                            ...prev,
+                                                            selectedSlug: term.slug,
+                                                            displayText: prev.displayText || term.term
+                                                        }));
+                                                    }}
+                                                    style={{
+                                                        padding: '6px 8px',
+                                                        cursor: 'pointer',
+                                                        background: isSelected ? '#1a1a1a' : '#fff',
+                                                        color: isSelected ? '#fff' : '#000',
+                                                        border: '1px solid',
+                                                        borderColor: isSelected ? '#1a1a1a' : '#ddd',
+                                                        borderRadius: '2px',
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        fontFamily: 'var(--font-mono, monospace)',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                        <strong>{term.term}</strong>
+                                                        <span style={{
+                                                            fontSize: '0.65rem',
+                                                            opacity: 0.8,
+                                                            background: isSelected ? '#333' : '#eee',
+                                                            padding: '1px 5px',
+                                                            borderRadius: '2px'
+                                                        }}>
+                                                            {term.category}
+                                                        </span>
+                                                    </div>
+                                                    {isSelected && <Check size={14} />}
+                                                </div>
+                                            );
+                                        })}
+                                </div>
+                            </div>
+
+                            {/* Dica de Hover Preview */}
+                            {dictionaryModal.selectedSlug && (
+                                <div style={{
+                                    marginTop: '8px',
+                                    padding: '8px 10px',
+                                    background: '#f0f7ff',
+                                    border: '1px solid #b8daff',
+                                    fontSize: '0.78rem',
+                                    lineHeight: 1.4,
+                                    color: '#004085'
+                                }}>
+                                    ✨ <strong>Prévia:</strong> Ao passar o mouse sobre <code>{dictionaryModal.displayText || dictionaryModal.selectedSlug}</code>, o leitor verá um resumo rápido e poderá clicar para abrir o artigo em nova aba.
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="tiptap-modal-actions">
+                            <button
+                                type="button"
+                                className="tiptap-btn tiptap-btn-secondary"
+                                onClick={() => setDictionaryModal(prev => ({ ...prev, isOpen: false }))}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                type="button"
+                                className="tiptap-btn tiptap-btn-primary"
+                                onClick={handleInsertDictionaryTerm}
+                                disabled={!dictionaryModal.selectedSlug}
+                            >
+                                <Check size={14} /> Vincular Termo
                             </button>
                         </div>
                     </div>

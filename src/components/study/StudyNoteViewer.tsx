@@ -28,11 +28,27 @@ const StudyNoteViewer: React.FC = () => {
     const addIdsToH2s = useCallback((html: string): string => {
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
-        const h2Elements = doc.querySelectorAll('h2');
 
+        // 1. IDs nos H2s para navegação
+        const h2Elements = doc.querySelectorAll('h2');
         h2Elements.forEach((h2, index) => {
             if (!h2.id) {
                 h2.id = `heading-${index}`;
+            }
+        });
+
+        // 2. Enriquecimento semântico dos links para o Dicionário
+        const dictLinks = doc.querySelectorAll('a[href*="/dicionario/"], [data-dictionary]');
+        dictLinks.forEach((el) => {
+            el.classList.add('dictionary-term-linked');
+            if (el instanceof HTMLAnchorElement) {
+                el.target = '_blank';
+                el.rel = 'noopener noreferrer';
+                const href = el.getAttribute('href') || '';
+                const match = href.match(/\/dicionario\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1] && !el.getAttribute('data-dictionary')) {
+                    el.setAttribute('data-dictionary', match[1]);
+                }
             }
         });
 
