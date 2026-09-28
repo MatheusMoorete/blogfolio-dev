@@ -676,5 +676,80 @@ Enquanto o \`localStorage\` é limitado a aproximadamente 5MB por origem e opera
 - **Transacional:** Toda operação de leitura ou escrita ocorre dentro de uma transação com garantias ACID.
 - **Suporte a Índices:** Permite criar índices sobre propriedades de objetos para buscas rápidas.
 - **Alta Capacidade:** Capaz de armazenar gigabytes de dados, condicionado ao espaço em disco livre da máquina do usuário.`
+    },
+    {
+        slug: 'handler',
+        term: 'Handler (Event Handler)',
+        pronunciation: '/ˈhænd.lɚ/',
+        category: 'DOM & Web APIs',
+        shortSummary: 'Função de callback registrada para responder e processar um evento específico disparado pelo usuário, pelo navegador ou pelo sistema.',
+        aliases: ['Event Handler', 'Manipulador de Eventos', 'Callback de Evento', 'Event Listener'],
+        keywords: ['handler', 'event handler', 'event listener', 'addeventlistener', 'callback', 'onclick', 'event'],
+        seeAlso: ['event-bubbling', 'syntheticevent', 'closure', 'usecallback'],
+        examples: [
+            {
+                title: 'Manipulador de eventos no DOM nativo e no React',
+                language: 'javascript',
+                code: `// No DOM Nativo:
+function handleClick(event) {
+  console.log('Elemento clicado:', event.target);
+}
+const botao = document.querySelector('button');
+botao.addEventListener('click', handleClick);
+
+// No React (com prop de evento em JSX):
+function Formulario() {
+  const handleSubmit = (event) => {
+    event.preventDefault(); // Impede recarregamento da página
+    console.log('Dados processados com sucesso!');
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <button type="submit">Enviar</button>
+    </form>
+  );
+}`,
+                description: 'O handler recebe o objeto de evento e define a lógica a ser executada.'
+            }
+        ],
+        content: `### O que é um Handler?
+
+No desenvolvimento de software orientado a eventos (*Event-Driven Architecture*), um **Handler** (ou **Event Handler** / Manipulador de Eventos) é uma função de callback encarregada de interceptar e responder a uma notificação de evento.
+
+No ambiente do navegador, interações humanas e rotinas do sistema geram eventos continuamente:
+- Cliques do mouse (\`click\`, \`dblclick\`).
+- Entradas de teclado (\`keydown\`, \`keyup\`).
+- Movimentações de rolagem e redimensionamento (\`scroll\`, \`resize\`).
+- Alterações de formulário (\`input\`, \`change\`, \`submit\`).
+- Ciclo de vida da rede e mídia (\`load\`, \`error\`, \`play\`).
+
+O handler é o código que traduz essas interações físicas ou mensagens do sistema em transformações de estado na aplicação.
+
+---
+
+### Anatomia do Objeto Event
+
+Ao ser acionado pelo motor do navegador, o handler recebe automaticamente como primeiro parâmetro uma instância de **\`Event\`** (ou **\`SyntheticEvent\`** no caso do React), expondo métodos e propriedades vitais:
+
+- **\`event.target\`:** O elemento exato que originou o evento (onde o usuário clicou).
+- **\`event.currentTarget\`:** O elemento ao qual o handler está atualmente vinculado (relevante ao usar *Event Delegation*).
+- **\`event.preventDefault()\`:** Cancela o comportamento nativo padrão que o navegador executaria (por exemplo, submeter um formulário com reload ou abrir um link).
+- **\`event.stopPropagation()\`:** Interrompe a propagação do evento nas fases de *bubbling* ou *capturing*.
+
+---
+
+### Formas de Associação
+
+1. **\`addEventListener()\` (Padrão Recomendado):** Permite associar múltiplos handlers independentes ao mesmo evento sem sobrescrever comportamentos prévios.
+2. **Propriedade DOM (\`element.onclick = handler\`):** Sobrescreve qualquer manipulador anterior atribuído àquela propriedade.
+3. **Props em JSX (\`onClick={handleClick}\`):** Padrão declarativo do React, que internamente gerencia a delegação dos listeners no container raiz.
+
+---
+
+### Cuidados de Engenharia e Boas Práticas
+
+- **Limpeza de Listeners (Memory Leaks):** Handlers registrados manualmente em \`window\` ou elementos globais devem ser explicitamente removidos com \`removeEventListener()\` na desmontagem de componentes (função de retorno de \`useEffect\`). Caso contrário, referências retidas nas closures do handler impedem o Garbage Collector de liberar a memória.
+- **Identidade Referencial:** No React, passar handlers anônimos inline (\`onClick={() => ...}\`) para componentes filhos memoizados com \`React.memo\` causa re-renderizações contínuas. A estabilização de referência é alcançada encapsulando a função com o hook \`useCallback\`.`
     }
 ];
