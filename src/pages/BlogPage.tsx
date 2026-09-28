@@ -7,7 +7,7 @@ import './Blog.css';
 import type { StudyNote } from '../types/study-notes';
 import { MOCK_NOTES } from '../data/mock-notes';
 import { DICTIONARY_TERMS } from '../data/dictionary';
-import { BookMarked, BookOpen, ArrowUpRight } from 'lucide-react';
+import { BookOpen, ArrowUpRight } from 'lucide-react';
 
 const BlogPage: React.FC = () => {
     const navigate = useNavigate();
@@ -70,17 +70,7 @@ const BlogPage: React.FC = () => {
     return (
         <div className="blog-page-container">
             <div className="blog-header-wrapper">
-                <div className="blog-header-top-row">
-                    <h1 style={{ margin: 0 }}>{t('blogTitle')}</h1>
-                    <button
-                        className="retro-button-secondary blog-header-dict-btn"
-                        onClick={() => navigate('/dicionario')}
-                        title="Explorar o Dicionário Frontend"
-                    >
-                        <BookMarked size={14} />
-                        <span>Dicionário Frontend</span>
-                    </button>
-                </div>
+                <h1 style={{ margin: 0 }}>{t('blogTitle')}</h1>
                 <p className="blog-page-subtitle">
                     {t('blogSubtitle')}
                 </p>
@@ -126,6 +116,16 @@ const BlogPage: React.FC = () => {
                         </div>
                     </div>
                 </Window>
+            </div>
+
+            {/* Início da Lista de Posts */}
+            <div className="blog-section-title-row">
+                <h2 className="blog-section-heading">Posts</h2>
+                {!loading && posts.length > 0 && (
+                    <span className="blog-section-count">
+                        {posts.length} publicação{posts.length > 1 ? 'ões' : ''}
+                    </span>
+                )}
             </div>
 
             <div className="blog-post-list">
