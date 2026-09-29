@@ -8,11 +8,9 @@ const translations = {
     heroCatchphrase: "Busco a engenharia por trás do pixel e a lógica por trás da solução.",
     viewProjects: "Ver Projetos",
     aboutTitle: "Sobre Mim",
-    aboutText: `Desenvolvedor de software focado em TypeScript, arquitetura frontend e os internals da plataforma Web.
+    aboutText: `Desenvolvedor de software focado em TypeScript, arquitetura frontend e nos internals da plataforma Web. Priorizo fundamentos sólidos em vez de modismos. Entender como o navegador realmente se comporta, como gerenciar estado e ciclo de vida de uma aplicação, e como observar o que acontece em produção é o que sustenta um sistema fácil de manter, mais do que qualquer framework do momento.
 
-Minha abordagem prioriza fundamentos sólidos em vez de modismos: entendo o comportamento de navegadores, gerenciamento de estado, ciclo de vida de aplicações e observabilidade para construir sistemas escaláveis e fáceis de manter.
-
-Encaro o desenvolvimento como uma disciplina contínua de engenharia, investigando a causa raiz de problemas em produção, estudando especificações abertas e documentando publicamente tudo o que aprendo.`,
+Encaro desenvolvimento como engenharia contínua: investigo a causa raiz dos problemas em vez de tratar sintomas, estudo as especificações abertas por trás das APIs que uso todo dia, e documento publicamente tudo o que aprendo nesse processo.`,
     quickLinks: "Links rápidos",
     projects: "Projetos",
     about: "Sobre Mim",
