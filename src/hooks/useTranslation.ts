@@ -8,7 +8,11 @@ const translations = {
     heroCatchphrase: "Busco a engenharia por trás do pixel e a lógica por trás da solução.",
     viewProjects: "Ver Projetos",
     aboutTitle: "Sobre Mim",
-    aboutText: "Estou cursando Engenharia de Software, mas já coloco a mão na massa profissionalmente há dois anos. Apesar de gostar de diversos ecossistemas, até o momento, minhas experiências foram com JavaScript, principalmente TypeScript utilizando React e ferramentas como Zustand, React Query, Axios, entre outros. Gosto dessa área pois existem problemas infinitos a serem resolvidos. Um dos meus maiores orgulhos foi solucionar um bug em produção que impedia o login dos usuários devido a dependências cíclicas em uma parte legada e mal estruturada do sistema, onde nenhuma IA conseguiu me auxiliar. Acredito que ser um bom engenheiro vai muito além de decorar frameworks; é entender como a arquitetura sustenta o projeto no longo prazo. Por isso, priorizo sempre os fundamentos da engenharia e os conceitos base da programação, pois o papel do desenvolvedor vai muito além do código — afinal, se fosse só codar, uma IA poderia fazer isso por mim. Fora do trabalho, a programação continua sendo meu hobby principal: se não estou desenvolvendo algo, provavelmente estou em casa criando um projeto pessoal ou estudando algo novo que me chamou a atenção no dia.",
+    aboutText: `Desenvolvedor de software focado em TypeScript, arquitetura frontend e os internals da plataforma Web.
+
+Minha abordagem prioriza fundamentos sólidos em vez de modismos: entendo o comportamento de navegadores, gerenciamento de estado, ciclo de vida de aplicações e observabilidade para construir sistemas escaláveis e fáceis de manter.
+
+Encaro o desenvolvimento como uma disciplina contínua de engenharia, investigando a causa raiz de problemas em produção, estudando especificações abertas e documentando publicamente tudo o que aprendo.`,
     quickLinks: "Links rápidos",
     projects: "Projetos",
     about: "Sobre Mim",
