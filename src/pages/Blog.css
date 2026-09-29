@@ -20,6 +20,22 @@
   margin-bottom: 2rem;
 }
 
+.blog-page-title {
+  font-family: var(--font-sans);
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.blog-page-subtitle {
+  margin: 0.5rem 0 0 0;
+  color: #666;
+  font-size: 1.05rem;
+  max-width: 800px;
+}
+
 /* Banner do Dicionário dentro do Blog */
 .blog-dictionary-banner {
   margin-bottom: 2.5rem;
@@ -76,7 +92,7 @@
   font-size: 0.9rem;
   line-height: 1.5;
   color: #555;
-  margin: 0 0 1rem 0;
+  margin: 0;
   max-width: 620px;
 }
 
@@ -87,41 +103,6 @@
   font-size: 0.85em;
   border: 1px solid #ddd;
   border-radius: 2px;
-}
-
-.blog-dict-quick-terms {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.quick-terms-label {
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  color: #777;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.quick-term-chip {
-  background: #ffffff;
-  border: 1px solid #1a1a1a;
-  box-shadow: 1px 1px 0px #1a1a1a;
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 600;
-  padding: 2px 8px;
-  cursor: pointer;
-  transition: all 0.1s ease;
-  color: #000;
-}
-
-.quick-term-chip:hover {
-  background: #1a1a1a;
-  color: #ffffff;
-  transform: translate(1px, 1px);
-  box-shadow: none;
 }
 
 .blog-dict-action {
@@ -148,19 +129,12 @@
 }
 
 .blog-section-heading {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 1.5rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
   margin: 0;
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.blog-section-heading::before {
-  content: '>';
-  color: #888;
 }
 
 .blog-section-count {

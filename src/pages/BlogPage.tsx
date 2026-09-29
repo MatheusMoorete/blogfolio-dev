@@ -70,7 +70,7 @@ const BlogPage: React.FC = () => {
     return (
         <div className="blog-page-container">
             <div className="blog-header-wrapper">
-                <h1 style={{ margin: 0 }}>{t('blogTitle')}</h1>
+                <h1 className="blog-page-title">{t('blogTitle')}</h1>
                 <p className="blog-page-subtitle">
                     {t('blogSubtitle')}
                 </p>
@@ -89,20 +89,6 @@ const BlogPage: React.FC = () => {
                             <p className="blog-dict-desc">
                                 Definições objetivas dos principais conceitos e APIs da Web linkadas nos artigos do blog (como <code>window</code>, <code>dom</code>, <code>closure</code>, <code>virtual-dom</code>).
                             </p>
-                            <div className="blog-dict-quick-terms">
-                                <span className="quick-terms-label">Acesso rápido:</span>
-                                {DICTIONARY_TERMS.slice(0, 5).map((term) => (
-                                    <button
-                                        key={term.slug}
-                                        type="button"
-                                        className="quick-term-chip"
-                                        onClick={() => navigate(`/dicionario/${term.slug}`)}
-                                        title={`Ver definição de ${term.term}`}
-                                    >
-                                        #{term.slug}
-                                    </button>
-                                ))}
-                            </div>
                         </div>
                         <div className="blog-dict-action">
                             <button
