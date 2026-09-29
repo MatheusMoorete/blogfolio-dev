@@ -599,5 +599,62 @@ próxima task
 - **Microtasks:** Callbacks de \`Promise.then()\`, continuações de \`async/await\` e \`queueMicrotask()\` são processados como microtasks.
 - **Tasks:** Timers como \`setTimeout()\` agendam trabalho para uma task futura.
 - O termo *macrotask* é bastante utilizado informalmente para diferenciar essas tasks das microtasks, embora a terminologia das especificações da Web utilize principalmente *task*.`
+    },
+    {
+        slug: 'monkey-patching',
+        term: 'Monkey Patching',
+        pronunciation: '/ˈmʌŋ.ki ˈpætʃ.ɪŋ/',
+        category: 'JavaScript Core',
+        shortSummary: 'Técnica que estende, modifica ou intercepta o comportamento em tempo de execução de métodos e APIs nativas sem alterar o código-fonte original.',
+        aliases: ['Monkey Patch', 'Method Swizzling', 'Runtime Patching', 'API Interception'],
+        keywords: ['monkey patching', 'monkey patch', 'interceptacao', 'instrumentacao', 'observabilidade', 'proxy', 'telemetria'],
+        seeAlso: ['history-api', 'call-stack', 'closure'],
+        examples: [
+            {
+                title: 'Interceptando history.pushState de forma segura e defensiva',
+                language: 'javascript',
+                code: `function installNavigationTracker() {
+  const originalPushState = history.pushState;
+
+  // Substitui a função nativa por um wrapper:
+  history.pushState = function(data, unused, url) {
+    const from = location.href;
+    
+    // 1. Executa a implementação original com contexto e argumentos intactos
+    const result = originalPushState.call(this, data, unused, url);
+    
+    // 2. Observa o resultado real após a alteração no navegador
+    const to = location.href;
+    console.log(\`Navegação detectada: de \${from} para \${to}\`);
+    
+    return result;
+  };
+
+  // Função de cleanup para desfazer o patch se necessário:
+  return () => {
+    history.pushState = originalPushState;
+  };
+}`,
+                description: 'Preserva argumentos opcionais e delega a resolução da URL real para o próprio navegador.'
+            }
+        ],
+        content: `### O que é Monkey Patching?
+
+O termo **Monkey Patching** descreve o padrão de desenvolvimento em que uma rotina, método ou API existente em tempo de execução (*runtime*) tem sua implementação original substituída dinamicamente por uma função customizada.
+
+No ecossistema frontend, é uma técnica amplamente empregada por:
+- **SDKs de Observabilidade e RUM (Datadog, Sentry, New Relic):** Para interceptar requisições \`window.fetch\` e \`XMLHttpRequest\`, capturar erros não tratados ou registrar navegações na History API.
+- **Polyfills:** Para fornecer suporte a métodos modernos em navegadores legados que não os possuem nativamente.
+
+---
+
+### As 4 Regras de Ouro da Instrumentação Segura
+
+Monkey patching altera objetos globais compartilhados por toda a aplicação. Uma instrumentação descuidada pode quebrar contratos e introduzir bugs severos:
+
+1. **Preserve a Assinatura Original:** Não force nem invente parâmetros. Se o método aceita parâmetros opcionais (como o \`url\` em \`pushState(state, unused, url?)\`), repasse-os rigorosamente através de \`.apply(this, args)\` ou \`.call(this, ...args)\`.
+2. **Execute a Função Real Primeiro:** Chame a implementação nativa antes de registrar logs. Se a chamada falhar (por exemplo, lançando um erro de segurança de URL cross-origin), o interceptor deve permitir que o erro exploda e não marcar a ação como concluída com sucesso.
+3. **Idempotência e Cleanup:** Em ambientes com recarregamento a quente (*HMR* / Vite / Webpack) ou testes, a função pode ser instalada múltiplas vezes. Sempre guarde a referência original e forneça um método de desinstalação para evitar empacotar um wrapper dentro de outro wrapper (*double patching*).
+4. **Não Invente Eventos Artificiais:** Se uma API nativa não dispara determinado evento (ex: \`pushState\` não dispara \`popstate\`), não force o disparo de um evento sintético global que possa ativar código de terceiros que não esperava rodar naquele momento.`
     }
 ];

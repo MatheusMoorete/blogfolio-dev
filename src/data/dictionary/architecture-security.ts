@@ -293,5 +293,184 @@ window.history.pushState({ page: 'sobre' }, 'Sobre Mim', '/sobre');
 Diferente de websites tradicionais onde cada link clicado solicita uma nova página HTML completa do servidor, uma **Single Page Application (SPA)** carrega a casca inicial da aplicação uma única vez.
 
 A partir desse momento, todo o roteamento de telas, busca de dados e renderização ocorrem no navegador do cliente usando JavaScript e a **HTML5 History API**, proporcionando uma experiência de uso extremamente ágil, com transições instantâneas semelhantes às de aplicativos nativos de desktop.`
+    },
+    {
+        slug: 'browsing-context',
+        term: 'Browsing Context (Contexto de Navegação)',
+        pronunciation: '/ˈbraʊ.zɪŋ ˈkɑːn.tɛkst/',
+        category: 'Web Architecture',
+        shortSummary: 'Ambiente no navegador em que documentos Document são apresentados ao usuário (como abas, janelas ou iframes), mantendo seu próprio histórico e ciclo de vida de armazenamento.',
+        aliases: ['Contexto de Navegação', 'Top-level Browsing Context', 'Navegação de Aba'],
+        keywords: ['browsing context', 'contexto de navegacao', 'aba', 'top level browsing context', 'iframe', 'sessionstorage', 'ciclo de vida'],
+        seeAlso: ['sessionstorage', 'window', 'history-api', 'window-opener', 'spa'],
+        examples: [
+            {
+                title: 'O ciclo de vida do Browsing Context e a persistência do sessionStorage',
+                language: 'javascript',
+                code: `// Dentro da mesma aba (Browsing Context persistente):
+sessionStorage.setItem('tabId', crypto.randomUUID());
+
+// 1. Dar reload (F5): O browsing context é mantido!
+console.log(sessionStorage.getItem('tabId')); // Retorna o mesmo ID intacto.
+
+// 2. Abrir uma nova aba manualmente (Ctrl + T ou link com target="_blank"):
+// Cria um NOVO Browsing Context independente!
+// Na nova aba: sessionStorage.getItem('tabId') será null.`,
+                description: 'O sessionStorage pertence ao ciclo de vida do contexto de navegação daquela aba específica.'
+            }
+        ],
+        content: `### O que é um Browsing Context?
+
+Na especificação oficial do **WHATWG HTML**, o navegador não enxerga abas ou janelas apenas como caixas visuais na tela, mas sim como **Contextos de Navegação** (*Browsing Contexts*).
+
+Um **Browsing Context** é o ambiente no qual um ou mais objetos \`Document\` são apresentados ao usuário. Ele é responsável por gerenciar a **pilha de histórico de sessão** (*session history*) e isolar o armazenamento de sessão daquela aba.
+
+---
+
+### Tipos de Browsing Contexts
+
+1. **Top-Level Browsing Context:**
+   - É a janela ou aba principal do navegador (aquele que não possui nenhum contexto pai).
+   - Não está aninhado dentro de nenhum elemento da página.
+
+2. **Nested Browsing Context (Contexto Aninhado):**
+   - Contextos incorporados dentro de outro documento, como tags \`<iframe>\`.
+   - Um iframe possui seu próprio objeto \`window\` e \`document\`, mas está subordinado ao ciclo de vida e às políticas de segurança (como permissões e sandbox) do contexto pai.
+
+---
+
+### Browsing Context e o Ciclo de Vida do sessionStorage
+
+Existe uma confusão recorrente entre o ciclo de vida do documento em memória e o ciclo de vida da aba:
+
+- **Recarregar a página (F5) NÃO destrói o contexto de navegação:** Embora todo o JavaScript da memória seja resetado e os nós da árvore DOM sejam destruídos e recriados, o *browsing context* permanece o mesmo. Por essa razão, dados gravados em \`sessionStorage\` e a pilha de \`history\` continuam intactos após um refresh.
+- **Fechar a aba destrói o contexto:** No instante em que o usuário fecha a aba ou a janela, o contexto de navegação atinge o fim do seu ciclo de vida, e os dados daquele \`sessionStorage\` específico são permanentemente apagados da memória do navegador.
+
+---
+
+### Importância em SPAs e Telemetria
+
+Quando um usuário abre três abas simultâneas da mesma aplicação web:
+- O \`localStorage\` e os \`cookies\` são **compartilhados** entre todas as abas (pois pertencem à mesma origem).
+- Cada aba possui seu próprio **Browsing Context isolado**, com sua própria pilha de histórico e seu próprio \`sessionStorage\`.
+
+Sistemas avançados de telemetria e observabilidade frontend utilizam o contexto de navegação para atribuir um identificador único por aba (\`tabId\`), permitindo correlacionar logs e navegações sem misturar as ações de abas diferentes do mesmo usuário.`
+    },
+    {
+        slug: 'client-side-routing',
+        term: 'Client-side Routing (Roteamento no Cliente)',
+        pronunciation: '/ˈklaɪ.ənt saɪd ˈruː.tɪŋ/',
+        category: 'Web Architecture',
+        shortSummary: 'Mecanismo em que a navegação entre telas e a sincronização da URL acontecem inteiramente no navegador via JavaScript, sem requisições de documentos HTML ao servidor.',
+        aliases: ['Roteamento no Cliente', 'Client-side Router', 'SPA Routing'],
+        keywords: ['client side routing', 'roteamento no cliente', 'roteador', 'react router', 'pushstate', 'popstate', 'spa', 'fallback 404'],
+        seeAlso: ['history-api', 'popstate', 'spa', 'monkey-patching'],
+        examples: [
+            {
+                title: 'Configuração essencial de Fallback no Nginx para suportar Client-side Routing',
+                language: 'nginx',
+                code: `server {
+    listen 80;
+    server_name meusite.com;
+    root /var/www/meusite/dist;
+    index index.html;
+
+    location / {
+        # Tenta servir o arquivo estático real; se não existir, entrega o index.html:
+        try_files $uri $uri/ /index.html;
+    }
+}`,
+                description: 'Sem esta diretiva de reescrita, recarregar rotas profundas (como /perfil/pedidos) resulta em HTTP 404.'
+            }
+        ],
+        content: `### O que é Client-side Routing?
+
+No modelo tradicional da web (**Multi-Page Applications - MPAs**), cada clique em um link solicitava uma nova página HTML completa do servidor. O navegador descartava todo o DOM atual, exibia uma tela em branco durante o carregamento de rede e montava a nova página do zero.
+
+Com o advento das **SPAs** e a introdução da **History API**, surgiu o **Client-side Routing** (Roteamento no Cliente). 
+
+Nesse padrão, a casca inicial da aplicação é baixada apenas uma vez. Quando o usuário clica em um link de navegação:
+1. O JavaScript intercepta o clique via \`event.preventDefault()\`.
+2. A URL na barra de endereços é atualizada silenciosamente usando \`history.pushState()\`.
+3. O roteador (como React Router, TanStack Router ou Vue Router) detecta a mudança e renderiza o novo componente correspondente na tela de forma quase instantânea, sem recarregar o documento.
+
+---
+
+### O Fluxo Sob o Capô: Mutações vs. Travessias
+
+Um roteador client-side lida com duas categorias de navegação:
+
+- **Navegações Diretas (Mutações):** Iniciadas por cliques em links (\`<Link to="/sobre">\`) ou comandos imperativos (\`navigate('/sobre')\`). Disparam internamente \`history.pushState()\` ou \`history.replaceState()\`.
+- **Navegações no Histórico (Travessias):** Iniciadas quando o usuário clica nos botões **Voltar** ou **Avançar** do navegador. O navegador dispara o evento nativo \`popstate\` no \`window\`, e o roteador lê a nova rota para sincronizar a interface.
+
+---
+
+### O Desafio do Fallback no Servidor (O Famoso 404 no F5)
+
+Como as rotas virtuais de uma SPA (ex: \`/dashboard/relatorios\`) não correspondem a pastas ou arquivos físicos reais no servidor web:
+- Se o usuário navegar de \`/\` para \`/dashboard/relatorios\` clicando em botões da tela, o roteamento no cliente funciona perfeitamente.
+- Porém, se o usuário der um **refresh (F5)** ou colar essa URL diretamente em uma nova aba, o navegador faz uma requisição HTTP real ao servidor buscando o arquivo \`/dashboard/relatorios\`.
+
+Se o servidor web (Nginx, Apache, CDN ou S3) não estiver configurado para reescrever todas as rotas de volta para o \`index.html\` principal, ele retornará um erro **404 Not Found**. A solução é a diretiva de fallback para SPA (\`try_files $uri /index.html\`).`
+    },
+    {
+        slug: 'window-opener',
+        term: 'window.opener (rel="noopener")',
+        pronunciation: '/ˈwɪn.doʊ ˈoʊ.pən.ɚ/',
+        category: 'Web Architecture',
+        shortSummary: 'Propriedade que referencia o contexto de navegação de origem que abriu a janela ou aba atual, apresentando implicações críticas de segurança e isolamento de armazenamento.',
+        aliases: ['window.opener', 'noopener', 'noreferrer', 'Reverse Tabnabbing'],
+        keywords: ['window opener', 'noopener', 'reverse tabnabbing', 'target blank', 'seguranca', 'sessionstorage clone'],
+        seeAlso: ['browsing-context', 'sessionstorage', 'same-origin-policy'],
+        examples: [
+            {
+                title: 'Protegendo links externos contra Reverse Tabnabbing',
+                language: 'html',
+                code: `<!-- Link externo seguro que desassocia o contexto da janela pai: -->
+<a href="https://site-externo.com" target="_blank" rel="noopener noreferrer">
+  Visitar Site Externo
+</a>
+
+<!-- Ao abrir via JavaScript, passe o recurso noopener: -->
+<script>
+  window.open('https://site-externo.com', '_blank', 'noopener');
+</script>`,
+                description: 'Impede que a nova página tenha acesso a window.opener e altere a URL da aba original.'
+            }
+        ],
+        content: `### O que é o window.opener?
+
+Quando uma página web abre uma nova aba ou janela através de um link com \`target="_blank"\` ou via comando JavaScript \`window.open()\`, o navegador define na nova página aberta a propriedade **\`window.opener\`**.
+
+Essa propriedade contém uma referência direta ao objeto \`window\` da página de origem que a disparou.
+
+---
+
+### O Perigo do Reverse Tabnabbing
+
+Historicamente, se você incluísse um link para um site de terceiros com \`target="_blank"\` simples sem proteção, o site externo poderia executar o seguinte código JavaScript:
+
+\`\`\`javascript
+if (window.opener) {
+  // Redireciona a sua aba original para uma página falsa de phishing!
+  window.opener.location = 'https://site-malicioso-phishing.com/login-falso';
+}
+\`\`\`
+
+Enquanto o usuário lia o artigo na nova aba, sua aba original era silenciosamente trocada de URL. Ao retornar para a aba inicial, ele acreditava que sua sessão havia expirado e digitava sua senha na página clonada do atacante.
+
+- **Mitigação:** Adicionar \`rel="noopener"\` limpa a referência e define \`window.opener = null\` na nova aba.
+- **Navegadores Modernos:** Navegadores atuais (Chrome 88+, Firefox 79+, Safari 12.1+) definem \`rel="noopener"\` implicitamente por padrão em links com \`target="_blank"\`, mas chamadas programáticas com \`window.open()\` ainda exigem atenção explícita.
+
+---
+
+### O Efeito Colateral no sessionStorage: A Clonagem Inicial
+
+Existe um detalhe pouco conhecido sobre o comportamento do \`sessionStorage\` ao abrir novas abas:
+
+1. Se você abrir uma nova aba vazia manualmente (\`Ctrl + T\`) ou via um link com \`rel="noopener"\`, o navegador cria um contexto de navegação completamente novo com um **\`sessionStorage\` 100% limpo**.
+2. No entanto, se uma nova aba for aberta para a mesma origem mantendo o vínculo de opener (sem \`noopener\`), a especificação do HTML determina que o navegador **copie um snapshot de todos os dados do \`sessionStorage\` da aba pai para a nova aba**.
+
+Após essa clonagem inicial, os dois armazenamentos tornam-se completamente independentes (alterações na nova aba não refletem na original). Contudo, essa herança de dados pode surpreender sistemas de telemetria ou autenticação que assumiam que cada nova aba sempre começava com estado vazio.`
     }
 ];

@@ -399,5 +399,71 @@ Diferente de scripts normais da página, o Service Worker possui um ciclo de vid
 1. **Experiência Offline Completa:** Intercepta eventos \`fetch\` e entrega páginas e recursos diretamente da **Cache Storage API**.
 2. **Push Notifications:** Recebe mensagens do servidor via Web Push API e exibe notificações nativas no sistema operacional.
 3. **Sincronização em Segundo Plano (*Background Sync*):** Envia formulários ou mensagens que o usuário tentou despachar enquanto estava sem sinal assim que a conexão for restaurada.`
+    },
+    {
+        slug: 'performance-now',
+        term: 'performance.now()',
+        pronunciation: '/pɚˈfɔːr.məns naʊ/',
+        category: 'Performance & Network',
+        shortSummary: 'Método da High Resolution Time API que retorna um timestamp em milissegundos de altíssima precisão baseado em um relógio monotônico contínuo imune a alterações do relógio do sistema.',
+        aliases: ['performance.now', 'High Resolution Time', 'Relógio Monotônico', 'window.performance.now'],
+        keywords: ['performance now', 'performance', 'high resolution time', 'relogio monotonico', 'telemetria', 'benchmarking', 'date now', 'timeorigin'],
+        seeAlso: ['event-loop', 'lcp', 'inp'],
+        examples: [
+            {
+                title: 'Medindo a duração de uma operação ou transição de tela com precisão submilissegundo',
+                language: 'javascript',
+                code: `const t0 = performance.now();
+
+// Simula execução de uma operação crítica ou transição de rota:
+await processarTransicaoDeRota();
+
+const t1 = performance.now();
+const duracao = t1 - t0;
+
+console.log(\`Transição concluída em \${duracao.toFixed(2)} ms\`);
+// Exemplo de saída: "Transição concluída em 14.85 ms"`,
+                description: 'Fornece medidas confiáveis mesmo que o relógio do sistema operacional sofra ajustes durante a execução.'
+            }
+        ],
+        content: `### O que é o performance.now()?
+
+O método **\`performance.now()\`**, pertencente à especificação **High Resolution Time** do W3C, retorna um timestamp de alta precisão em formato de número de ponto flutuante (*DOMHighResTimeStamp*).
+
+O valor retornado representa a quantidade de milissegundos decorridos desde a propriedade \`performance.timeOrigin\` (o momento em que a navegação do documento atual foi iniciada).
+
+---
+
+### Por que NÃO usar Date.now() para Medir Duração?
+
+Um dos erros mais comuns de telemetria e benchmarking no frontend é calcular durações com \`Date.now()\`:
+
+\`\`\`javascript
+// ❌ PROBLEMÁTICO:
+const inicio = Date.now();
+executarTarefa();
+const duracao = Date.now() - inicio; // Pode dar negativo ou incorreto!
+\`\`\`
+
+- **\`Date.now()\` (Relógio de Parede / Wall-Clock):** É diretamente atrelado ao relógio do sistema operacional da máquina do usuário. Se o sistema sofrer sincronização de rede via protocolo NTP, ajuste de horário de verão ou alteração manual pelo usuário, o relógio pode saltar para frente ou para trás. Isso pode resultar em cálculos de tempo negativos ou durações completamente irreais.
+- **\`performance.now()\` (Relógio Monotônico):** É alimentado por um contador de alta precisão do hardware que **nunca retrocede** e não sofre influência de fusos horários ou NTP. Ele avança a uma taxa rigorosamente contínua e uniforme.
+
+---
+
+### Alta Resolução e Mitigações de Segurança
+
+Enquanto \`Date.now()\` tem precisão limitada a números inteiros de milissegundos (1 ms), \`performance.now()\` oferece resolução teórica de microssegundos (frações de milissegundo, ex: \`14.8234 ms\`).
+
+> [!NOTE]
+> Para mitigar ataques de temporização e vazamento de memória em nível de processador (*Spectre* e *Meltdown*), navegadores modernos adicionam uma ligeira redução de precisão (*jitter* ou arredondamento entre 5 a 100 microssegundos), a menos que a aplicação esteja em um ambiente de isolamento de origem cruzada (*Cross-Origin Isolated*). Mesmo com essa mitigação, a precisão continua infinitamente superior à de \`Date.now()\`.
+
+---
+
+### Uso em Observabilidade e SPAs
+
+Em Single Page Applications e ferramentas de RUM (Real User Monitoring), o \`performance.now()\` é a ferramenta padrão para:
+1. **Medir Route Transition Time:** O tempo decorrido desde o clique no link até a renderização completa da nova página.
+2. **Identificar Long Tasks:** Tarefas síncronas que bloqueiam a thread principal por mais de 50 ms.
+3. **Calcular métricas de animações:** Garantir taxas suaves de 60 FPS ou 120 FPS em sincronia com o \`requestAnimationFrame()\`.`
     }
 ];

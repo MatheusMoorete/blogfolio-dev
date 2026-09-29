@@ -751,5 +751,135 @@ Ao ser acionado pelo motor do navegador, o handler recebe automaticamente como p
 
 - **Limpeza de Listeners (Memory Leaks):** Handlers registrados manualmente em \`window\` ou elementos globais devem ser explicitamente removidos com \`removeEventListener()\` na desmontagem de componentes (função de retorno de \`useEffect\`). Caso contrário, referências retidas nas closures do handler impedem o Garbage Collector de liberar a memória.
 - **Identidade Referencial:** No React, passar handlers anônimos inline (\`onClick={() => ...}\`) para componentes filhos memoizados com \`React.memo\` causa re-renderizações contínuas. A estabilização de referência é alcançada encapsulando a função com o hook \`useCallback\`.`
+    },
+    {
+        slug: 'history-api',
+        term: 'History API',
+        pronunciation: '/ˈhɪs.tɚ.i eɪ.piː.aɪ/',
+        category: 'Browser APIs',
+        shortSummary: 'Interface do navegador que permite interagir com a pilha de histórico da sessão da aba, adicionando, modificando ou percorrendo entradas sem recarregar o documento.',
+        aliases: ['window.history', 'Session History API', 'History Interface'],
+        keywords: ['history api', 'history', 'pushstate', 'replacestate', 'back', 'forward', 'spa', 'session history'],
+        seeAlso: ['popstate', 'spa', 'browsing-context', 'client-side-routing'],
+        examples: [
+            {
+                title: 'Manipulando entradas de histórico com pushState e replaceState',
+                language: 'javascript',
+                code: `// Adiciona uma nova entrada à pilha (o botão Voltar fica ativo):
+history.pushState({ productId: 42 }, '', '/produtos/42');
+
+// Substitui a entrada atual (ótimo para filtros sem poluir o histórico):
+history.replaceState({ sort: 'preco-asc' }, '', '/produtos/42?sort=preco-asc');
+
+// Navega programaticamente pela pilha existente:
+history.back();    // Equivalente a clicar no botão Voltar
+history.forward(); // Equivalente a clicar no botão Avançar
+history.go(-2);    // Volta 2 páginas de uma só vez`,
+                description: 'Nenhuma dessas operações dispara recarregamento de página nem faz requisição HTTP de documento.'
+            }
+        ],
+        content: `### O que é a History API?
+
+A **History API** é a interface do objeto \`window.history\` que permite a um script interagir com a pilha de histórico de navegação da sessão (*session history stack*) associada ao contexto de navegação (a aba atual).
+
+Em aplicações tradicionais (Multi-Page Applications), cada entrada no histórico correspondia a um documento HTML totalmente novo baixado do servidor. Em SPAs modernas, a History API é o pilar que viabiliza o **Roteamento no Cliente** (*Client-side Routing*).
+
+---
+
+### Os Dois Grupos de Operações
+
+É essencial separar as operações da History API em duas naturezas distintas:
+
+1. **Alterar o histórico (Mutações):**
+   - \`history.pushState(state, unused, url?)\`: Insere uma nova entrada no topo da pilha do histórico e atualiza a barra de endereço da URL.
+   - \`history.replaceState(state, unused, url?)\`: Atualiza os dados de estado e/ou a URL da entrada atual sem criar um novo degrau na pilha.
+   - **Atenção:** Nenhuma das duas dispara o evento \`popstate\`!
+
+2. **Percorrer o histórico (Travessias / Traversal):**
+   - \`history.back()\`, \`history.forward()\`, \`history.go(delta)\`.
+   - Navega entre entradas preexistentes na pilha da aba. Essas travessias disparam o evento \`popstate\` no \`window\`.
+
+---
+
+### O Objeto de Estado (\`state\`) e a Mesma Origem
+
+- **Armazenamento Serializado:** O primeiro parâmetro (\`state\`) aceita qualquer estrutura de dados compatível com o algoritmo de Clonagem Estruturada (*Structured Clone*). Ele fica armazenado pelo navegador junto àquela entrada específica do histórico, mesmo após F5.
+- **Restrição de Mesma Origem:** O parâmetro \`url\` deve obrigatoriamente pertencer à mesma origem (protocolo, domínio e porta) da página atual. Tentar passar uma URL de outro domínio lança uma exceção de segurança imediata: \`SecurityError\` (DOMException).`
+    },
+    {
+        slug: 'popstate',
+        term: 'popstate (PopStateEvent)',
+        pronunciation: '/pɑːp steɪt/',
+        category: 'Browser APIs',
+        shortSummary: 'Evento disparado no window quando o histórico ativo da sessão é percorrido para outra entrada existente (como ao clicar em Voltar ou Avançar no navegador).',
+        aliases: ['PopStateEvent', 'Evento popstate', 'window.onpopstate'],
+        keywords: ['popstate', 'popstateevent', 'history traversal', 'voltar avancar', 'history api', 'navegacao spa'],
+        seeAlso: ['history-api', 'client-side-routing', 'window'],
+        examples: [
+            {
+                title: 'Ouvindo travessias de histórico com popstate',
+                language: 'javascript',
+                code: `window.addEventListener('popstate', (event) => {
+  console.log('Nova URL atual:', location.pathname);
+  console.log('Estado recuperado da entrada:', event.state);
+  
+  // Roteadores utilizam esse evento para renderizar a tela anterior!
+});`,
+                description: 'Disparado quando o usuário clica nos botões de navegação do browser.'
+            }
+        ],
+        content: `### O que é o evento popstate?
+
+O evento **\`popstate\`** é disparado na janela global (\`window\`) exclusivamente quando a entrada ativa do histórico de navegação da sessão muda em decorrência de uma **travessia de histórico** (*history traversal*).
+
+Exemplos de ações que disparam \`popstate\`:
+- O usuário clica no botão **Voltar** ou **Avançar** do navegador.
+- O código JavaScript executa \`history.back()\`, \`history.forward()\` ou \`history.go(n)\`.
+- Ocorre alteração de âncora de fragmento hash na URL (em certos cenários onde não há \`hashchange\` dedicado).
+
+---
+
+### O Grande Mito: popstate NÃO significa "a URL mudou"
+
+Um dos equívocos conceituais mais comuns no frontend é tratar \`popstate\` como um evento genérico de mudança de rota.
+
+> [!IMPORTANT]
+> Chamadas programáticas a \`history.pushState()\` e \`history.replaceState()\` **NÃO disparam o evento \`popstate\`**.
+
+Se um sistema de telemetria ou analytics tentar monitorar as mudanças de rota de uma SPA ouvindo apenas \`window.addEventListener('popstate')\`, ele perderá praticamente todas as navegações iniciadas por cliques em links de roteadores como React Router ou Vue Router.
+
+Para observar todas as transições de forma agnóstica de framework, é necessário combinar a escuta de \`popstate\` com a interceptação (*monkey-patching*) de \`pushState\` e \`replaceState\`.`
+    },
+    {
+        slug: 'crypto-randomuuid',
+        term: 'crypto.randomUUID()',
+        pronunciation: '/ˈkrɪp.toʊ ˈræn.dəm juː.juː.aɪˈdiː/',
+        category: 'Browser APIs',
+        shortSummary: 'Método nativo da Web Crypto API que gera identificadores universais únicos v4 (UUIDs) utilizando o gerador de números pseudoaleatórios criptograficamente seguro do sistema.',
+        aliases: ['crypto.randomUUID', 'Web Crypto API', 'UUID v4'],
+        keywords: ['crypto', 'randomuuid', 'uuid', 'uuid v4', 'web crypto api', 'identificador unico', 'tabid'],
+        seeAlso: ['sessionstorage', 'window'],
+        examples: [
+            {
+                title: 'Gerando identificador único de sessão ou aba',
+                language: 'javascript',
+                code: `// Gera um UUID v4 padrão RFC 4122 nativamente:
+const idAba = crypto.randomUUID();
+console.log(idAba); 
+// Exemplo de saída: "9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d"`,
+                description: 'Nativo do navegador, sem precisar instalar pacotes como "uuid" do npm.'
+            }
+        ],
+        content: `### O que é o crypto.randomUUID()?
+
+Historicamente, gerar um UUID (Universally Unique Identifier) no frontend exigia instalar pacotes de terceiros no \`node_modules\` (como a popular biblioteca \`uuid\`, que aumentava o tamanho do bundle) ou usar funções rudimentares baseadas em \`Math.random()\`.
+
+O método nativo **\`crypto.randomUUID()\`**, padronizado na **Web Crypto API**, gera diretamente uma string de 36 caracteres contendo um **UUID versão 4** em conformidade rigorosa com a RFC 4122.
+
+---
+
+### Por que NÃO usar Math.random()?
+- **\`Math.random()\`** é um PRNG pseudo-aleatório simples e previsível. Ele não foi desenhado para segurança, sofrendo de colisões frequentes e suscetibilidade à previsão matemática reversa.
+- **\`crypto.randomUUID()\`** utiliza o CSPRNG (*Cryptographically Secure Pseudo-Random Number Generator*) fornecido pelo próprio sistema operacional subjacente, garantindo entropia máxima para identificadores de sessão (\`tabId\`), correlação de rastros de observabilidade e chaves únicas no cliente.`
     }
 ];
