@@ -1343,7 +1343,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                 >
                     <div
                         className="tiptap-modal"
-                        style={{ maxWidth: '480px', width: '92%' }}
+                        style={{ maxWidth: '480px', width: '92%', maxHeight: '90vh' }}
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="tiptap-modal-header">
@@ -1360,7 +1360,7 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                             </button>
                         </div>
 
-                        <div className="tiptap-modal-body">
+                        <div className="tiptap-modal-body" style={{ overflowY: 'auto', paddingRight: '2px' }}>
                             {/* Feedback de sucesso de vinculação automática */}
                             {dictionaryModal.feedbackMessage && (
                                 <div style={{
@@ -1450,7 +1450,17 @@ const TiptapEditor: React.FC<TiptapEditorProps> = ({
                                         Nenhum termo do catálogo foi detectado no texto até o momento.
                                     </p>
                                 ) : (
-                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                    <div
+                                        className="tiptap-detected-terms-list"
+                                        style={{
+                                            display: 'flex',
+                                            gap: '6px',
+                                            flexWrap: 'wrap',
+                                            maxHeight: '135px',
+                                            overflowY: 'auto',
+                                            paddingRight: '4px'
+                                        }}
+                                    >
                                         {dictionaryModal.detectedTerms.map(({ term, count, alreadyLinked }) => (
                                             <div
                                                 key={term.slug}
